@@ -1,0 +1,13 @@
+[package]
+name = "nitroman-core"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+windows = { version = "0.62.2", features = ["Win32_System_Wmi", "Win32_System_Com", "Win32_System_Variant"] }
+
+[target.'cfg(windows)'.dependencies]
+wmi = "0.17"

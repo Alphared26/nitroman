@@ -1,0 +1,12 @@
+[package]
+name = "nitroman-cli"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "nitroman-cli"
+path = "src/main.rs"
+
+[dependencies]
+nitroman-core = { path = "../nitroman-core" }
+serde_json.workspace = true

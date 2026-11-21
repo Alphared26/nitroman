@@ -1,0 +1,241 @@
+{
+  "project": {
+    "name": "NitroMan",
+    "description": "Penggabungan Acer Care Center + NitroSense jadi satu aplikasi desktop super ringan",
+    "target_device": "Acer Nitro AN515-57 (Windows 11, BIOS 1.17)",
+    "tech_stack": {
+      "language": "Rust",
+      "gui_framework": "Tauri v2",
+      "frontend": "HTML + Tailwind CSS + Alpine.js",
+      "wmi_access": "crate windows / wmi"
+    },
+    "performance_target": {
+      "binary_size": "~10MB",
+      "ram_idle": "~40-60MB",
+      "startup_time": "<0.5 detik",
+      "comparison_original": "ACC + NitroSense = 300-600MB RAM, startup 5-8 detik"
+    },
+    "design": {
+      "theme": "dark",
+      "background_color": "#121316",
+      "card_color": "#1A1D24",
+      "accent_color": "#E4002B",
+      "behavior": "Hybrid — tray monitoring background + jendela GUI penuh bisa dibuka kapan saja",
+      "autostart": true,
+      "autostart_mechanism": "Windows Task Scheduler (Run with highest privileges, tanpa popup UAC)",
+      "requires_admin": true
+    }
+  },
+  "features": {
+    "included": [
+      {
+        "category": "Fan Control",
+        "items": [
+          "Fan speed manual CPU/GPU (0-100%)",
+          "Fan mode (Auto / Quiet / Balanced / Performance / Custom)",
+          "CoolBoost Mode Toggle (menaikkan batas maksimum RPM saat beban tinggi)",
+          "Fan curve kustom (grafik interaktif per suhu)",
+          "Fan RPM realtime monitor (CPU & GPU)"
+        ],
+        "wmi_source": "AcerGamingFunction (SetGamingFanSpeed, SetGamingFanBehavior, SetGamingFanTable, GetGamingSysInfo)"
+      },
+      {
+        "category": "Thermal & Performance",
+        "items": [
+          "Thermal profile: Quiet / Balanced / Performance",
+          "CPU temp realtime & sparkline history",
+          "GPU temp realtime & sparkline history"
+        ],
+        "wmi_source": "AcerGamingFunction (SetGamingProfile, GetGamingSysInfo)"
+      },
+      {
+        "category": "Keyboard RGB (4-Zone)",
+        "items": [
+          "4-zone color control (Zone 1-4 hex & preset swatch)",
+          "Preset effects: Static / Breathing / Wave / Off",
+          "Brightness slider (0-100%)",
+          "Live interactive preview mini keyboard 4-zone"
+        ],
+        "wmi_source": "AcerGamingFunction (SetGamingRgbKb, SetGamingLEDColor, SetGamingLEDBehavior, SetGamingKBBacklight)"
+      },
+      {
+        "category": "Battery Care",
+        "items": [
+          "80% Charge Limit Toggle (Battery Health / Conservation Mode)",
+          "Battery health status & cycle count",
+          "Estimasi runtime & remaining capacity (mWh)",
+          "Charging state indicator"
+        ],
+        "wmi_source": "root\\WMI:BatteryControl (SetBatteryHealthControl, GetBatteryHealthControlStatus) + Win32_Battery"
+      },
+      {
+        "category": "System Info & TuneUp",
+        "items": [
+          "Hardware spec summary (CPU, GPU, RAM, SSD, Network)",
+          "SMART storage health monitoring",
+          "Disk Cleanup (Clean Temp, Recycle Bin via SHEmptyRecycleBin)",
+          "Startup Manager (List & toggle apps in HKLM/HKCU Run keys)"
+        ],
+        "wmi_source": "Win32_* classes, Windows Registry API, SHEmptyRecycleBin"
+      },
+      {
+        "category": "Quick Tray Popup",
+        "items": [
+          "Mini flyout window dari taskbar tray",
+          "Profile switcher cepat (Quiet / Balanced / Performance)",
+          "80% Battery Care toggle",
+          "CoolBoost quick toggle",
+          "Suhu CPU/GPU & RPM ringkas"
+        ]
+      }
+    ],
+    "excluded": [
+      {
+        "feature": "Overclocking",
+        "reason": "Hardware AN515-57 tidak mendukung OC (CPU_OC_Support = 0, GPU_OC_Support = 0 di BIOS)"
+      },
+      {
+        "feature": "Arbitrary Battery Slider (50-100%)",
+        "reason": "Firmware EC Acer hanya mendukung batas diskrit 80% (Conservation Mode), bukan arbitrary percentage"
+      },
+      {
+        "feature": "LiveUpdate (auto-update driver)",
+        "reason": "Backend cloud Acer, tidak perlu koneksi online"
+      },
+      {
+        "feature": "Support / Ticket / Warranty check",
+        "reason": "Backend cloud Acer, tidak perlu online"
+      },
+      {
+        "feature": "Planet9 / Komunitas",
+        "reason": "Bloatware online bawaan Acer"
+      },
+      {
+        "feature": "Recovery / Factory Reset",
+        "reason": "Cukup gunakan Windows Reset built-in"
+      },
+      {
+        "feature": "RGB per-key animation",
+        "reason": "Hardware keyboard AN515-57 bertipe 4-Zone, bukan per-key"
+      }
+    ]
+  },
+  "gui_pages": [
+    {
+      "page": "Dashboard",
+      "elements": [
+        "Kartu metrik realtime: CPU temp, GPU temp, CPU Fan RPM, GPU Fan RPM, Battery %",
+        "Grafik suhu realtime (sparkline SVG)",
+        "Quick Thermal Profiles (Quiet, Balanced, Performance)",
+        "Quick Toggle CoolBoost & 80% Battery Limit"
+      ]
+    },
+    {
+      "page": "Fan Control",
+      "elements": [
+        "Mode selector (Auto, Quiet, Balanced, Performance, Custom)",
+        "CoolBoost Mode switch",
+        "Manual sliders CPU & GPU (0-100%)",
+        "Interactive Fan Curve editor (drag control points, 40°C - 90°C)",
+        "Apply / Reset buttons"
+      ]
+    },
+    {
+      "page": "RGB Keyboard",
+      "elements": [
+        "Visual 4-zone interactive keyboard preview",
+        "Per-zone color pickers (Zone 1, 2, 3, 4)",
+        "Preset effects: Static, Breathing, Wave, Off",
+        "Brightness slider (0-100%)"
+      ]
+    },
+    {
+      "page": "Battery Care",
+      "elements": [
+        "Battery Care 80% Limit toggle",
+        "Health percentage & cycle count",
+        "Current charge (mWh), design capacity, full capacity",
+        "Estimated runtime on battery"
+      ]
+    },
+    {
+      "page": "System & TuneUp",
+      "elements": [
+        "Hardware summary cards",
+        "SMART disk health",
+        "Disk Cleanup action",
+        "Startup apps list with toggle switches"
+      ]
+    },
+    {
+      "page": "Settings",
+      "elements": [
+        "Autostart toggle (Task Scheduler elevated)",
+        "Tray minimize on close",
+        "Sensor polling interval (1s, 2s, 5s)",
+        "About NitroMan"
+      ]
+    },
+    {
+      "page": "Tray Popup",
+      "elements": [
+        "Mini telemetry flyout",
+        "Quick profile selection pills",
+        "Open NitroMan / Exit buttons"
+      ]
+    }
+  ],
+  "phases": [
+    {
+      "id": 0,
+      "name": "Reverse Engineering Protocol WMI",
+      "goal": "Dokumentasikan format UInt64 opcode untuk method WMI AcerGamingFunction & BatteryControl",
+      "deliverable": "docs/wmi-protocol.md",
+      "blocking": true,
+      "estimated_days": "1"
+    },
+    {
+      "id": 1,
+      "name": "Core Library + PoC CLI",
+      "goal": "Verifikasi pemanggilan WMI aman di Rust untuk AN515-57",
+      "deliverable": "nitroman-core + nitroman-cli",
+      "depends_on": [0],
+      "estimated_days": "1"
+    },
+    {
+      "id": 2,
+      "name": "Background Monitoring & Tray Service",
+      "goal": "Background loop ringan untuk polling sensor & tray icon",
+      "deliverable": "nitroman-service / tray daemon",
+      "depends_on": [1],
+      "estimated_days": "1"
+    },
+    {
+      "id": 3,
+      "name": "Tauri GUI Implementation",
+      "goal": "Frontend Tauri interaktif berdasarkan mockup",
+      "deliverable": "nitroman-gui",
+      "sub_phases": [
+        {
+          "id": "3a",
+          "name": "Mockup UI Preview (design/preview.html)",
+          "done": true
+        },
+        {
+          "id": "3b",
+          "name": "Tauri v2 Integration",
+          "depends_on": [1, "3a"]
+        }
+      ],
+      "estimated_days": "2"
+    },
+    {
+      "id": 4,
+      "name": "Packaging & Benchmark",
+      "goal": "Build release binary + pengukuran konsumsi RAM/startup vs ACC & NitroSense",
+      "deliverable": "nitroman-setup.exe + laporan benchmark",
+      "depends_on": [2, "3b"],
+      "estimated_days": "1"
+    }
+  ]
+}

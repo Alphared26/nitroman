@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NitroMan - Hardware Control Center (Stealth Red-Black Redesign)</title>
+  <style>
+    /* ================= SYSTEM RESET & VARIABLES ================= */
+    :root {
+      --bg-void: #050608;
+      --bg-chassis: #0A0C11;
+      --bg-panel: #10131A;
+      --bg-card: #151922;
+      --bg-card-hover: #1C212E;
+      --bg-module: #1E2432;
+      
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-medium: rgba(255, 255, 255, 0.15);
+      --border-red: rgba(255, 26, 53, 0.45);
+      --border-red-glow: rgba(255, 26, 53, 0.25);
+
+      --nitro-crimson: #FF1A35;
+      --nitro-crimson-bright: #FF3B52;
+      --nitro-crimson-dim: #990E1E;
+      --nitro-dark-red: #50060E;
+      
+      --tx-primary: #F1F4F9;
+      --tx-secondary: #8E98A8;
+      --tx-dim: #545E70;
+      
+      --led-green: #00E676;
+      --led-amber: #FFAA00;
+      
+      --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, 'Courier New', monospace;
+      
+      --chamfer: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+      --chamfer-lg: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-void);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(255, 26, 53, 0.07) 0%, transparent 60%),
+        linear-gradient(to bottom, #07090D 0%, #040507 100%);
+      color: var(--tx-primary);
+      font-family: var(--font-ui);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .tabular {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ================= TOP COCKPIT HEADER ================= */
+    header {
+      background: var(--bg-chassis);
+      border-bottom: 1px solid var(--border-subtle);
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 140px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--nitro-crimson) 0%, transparent 100%);
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-mark {
+      display: flex;
+      align-items: baseline;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+    }
+
+    .logo-nitro {
+      color: #E2E8F0;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    }
+
+    .logo-man {
+      color: var(--nitro-crimson);
+      margin-left: 2px;
+      text-shadow: 0 0 12px rgba(255, 26, 53, 0.6);
+    }
+
+    .hardware-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--tx-secondary);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 3px 8px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 3px;
+      letter-spacing: 0.03em;
+    }
+
+    .hardware-tag span {
+      color: var(--tx-dim);
+      margin: 0 4px;
+    }
+
+    /* Tab Switcher */
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 3px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--tx-secondary);
+      font-family: var(--font-ui);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all 120ms ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab-btn:hover {
+      color: var(--tx-primary);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      color: #FFF;
+      background: var(--nitro-crimson);
+      box-shadow: 0 0 10px rgba(255, 26, 53, 0.4);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-led {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--tx-secondary);
+    }
+
+    .led-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--led-green);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--led-green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.9); }
+    }
+
+    .btn-hud-toggle {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--tx-primary);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 12px;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all 120ms ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-hud-toggle:hover {
+      border-color: var(--nitro-crimson);
+      color: var(--nitro-crimson-bright);
+    }
+
+    /* ================= MAIN CONTENT CONTAINER ================= */
+    main {
+      flex: 1;
+      padding: 16px 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .view-panel {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      height: 100%;
+    }
+
+    .view-panel.active {
+      display: flex;
+    }
+
+    /* ================= CARDS & MODULAR SURFACES ================= */
+    .tactical-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      clip-path: var(--chamfer);
+      padding: 16px;
+      position: relative;
+    }
+
+    .tactical-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--tx-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 11px;
+      background: var(--nitro-crimson);
+      box-shadow: 0 0 6px var(--nitro-crimson);
+    }
+
+    .card-meta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--tx-dim);
+    }
+
+    /* ================= DASHBOARD LAYOUT ================= */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .gauges-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* ================= PURE VECTOR SVG TACHOMETER ================= */
+    .gauge-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      clip-path: var(--chamfer-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .gauge-svg-wrap {
+      width: 220px;
+      height: 190px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gauge-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .gauge-center-readout {
+      position: absolute;
+      top: 92px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .gauge-temp-val {
+      font-family: var(--font-mono);
+      font-size: 38px;
+      font-weight: 900;
+      line-height: 1;
+      color: #FFF;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+
+    .gauge-temp-unit {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--nitro-crimson);
+      margin-left: 2px;
+    }
+
+    .gauge-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--tx-secondary);
+      margin-top: 4px;
+    }
+
+    /* 4-Box Telemetry Strip under Dial */
+    .telemetry-strip {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .telem-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 3px;
+      padding: 8px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .telem-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--tx-dim);
+      text-transform: uppercase;
+    }
+
+    .telem-val {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--tx-primary);
+      margin-top: 2px;
+    }
+
+    .telem-val small {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--tx-secondary);
+      margin-left: 1px;
+    }
+
+    /* ================= CONTROL MATRIX ================= */
+    .controls-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Segmented Selector Buttons */
+    .selector-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .group-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--tx-secondary);
+    }
+
+    .segmented-control {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      padding: 3px;
+      border-radius: 4px;
+      gap: 4px;
+    }
+
+    .seg-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--tx-secondary);
+      font-family: var(--font-ui);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 10px 8px;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all 120ms ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .seg-btn sub {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--tx-dim);
+      text-transform: none;
+    }
+
+    .seg-btn:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--tx-primary);
+    }
+
+    .seg-btn.active {
+      background: linear-gradient(180deg, #240508 0%, #150204 100%);
+      border-color: var(--nitro-crimson);
+      color: #FFF;
+      box-shadow: 0 0 10px rgba(255, 26, 53, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .seg-btn.active sub {
+      color: var(--nitro-crimson-bright);
+    }
+
+    /* Tactical Rocker Switches */
+    .toggles-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .toggle-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 120ms ease;
+    }
+
+    .toggle-item:hover {
+      border-color: var(--border-medium);
+      background: var(--bg-card-hover);
+    }
+
+    .toggle-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .toggle-name {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--tx-primary);
+    }
+
+    .toggle-desc {
+      font-size: 10px;
+      color: var(--tx-dim);
+    }
+
+    /* Custom Tactical Switch Knob */
+    .switch-ui {
+      width: 42px;
+      height: 22px;
+      background: #090B0F;
+      border: 1px solid var(--border-subtle);
+      border-radius: 11px;
+      position: relative;
+      transition: all 150ms ease;
+      flex-shrink: 0;
+    }
+
+    .switch-knob {
+      width: 16px;
+      height: 16px;
+      background: var(--tx-secondary);
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .toggle-item.checked {
+      border-color: var(--border-red);
+    }
+
+    .toggle-item.checked .switch-ui {
+      background: var(--nitro-dark-red);
+      border-color: var(--nitro-crimson);
+    }
+
+    .toggle-item.checked .switch-knob {
+      background: var(--nitro-crimson);
+      transform: translateX(20px);
+      box-shadow: 0 0 8px var(--nitro-crimson);
+    }
+
+    /* ================= OSCILLOSCOPE BOTTOM BAR ================= */
+    .oscilloscope-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      clip-path: var(--chamfer);
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .oscilloscope-graph {
+      height: 70px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .grid-lines {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    /* ================= 4-ZONE RGB KEYBOARD DECK ================= */
+    .keyboard-preview-container {
+      background: #07090D;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .keyboard-deck-frame {
+      background: #0D1016;
+      border: 2px solid #1E2430;
+      border-radius: 6px;
+      padding: 10px;
+      box-shadow: inset 0 0 25px rgba(0,0,0,0.8), 0 8px 24px rgba(0,0,0,0.6);
+    }
+
+    .keyboard-grid-svg {
+      width: 100%;
+      height: 240px;
+      display: block;
+    }
+
+    .rgb-zones-selector {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .zone-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 120ms ease;
+    }
+
+    .zone-card:hover {
+      border-color: var(--border-medium);
+    }
+
+    .zone-card.active {
+      border-color: var(--nitro-crimson);
+      background: #170406;
+      box-shadow: 0 0 10px rgba(255, 26, 53, 0.2);
+    }
+
+    .zone-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .zone-name {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .zone-color-indicator {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 0 6px currentColor;
+    }
+
+    .rgb-modes-matrix {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+
+    .mode-chip {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--tx-secondary);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 8px 10px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all 120ms ease;
+    }
+
+    .mode-chip:hover {
+      color: #FFF;
+      background: var(--bg-card-hover);
+    }
+
+    .mode-chip.active {
+      background: var(--nitro-crimson);
+      color: #FFF;
+      border-color: var(--nitro-crimson);
+      box-shadow: 0 0 8px rgba(255, 26, 53, 0.4);
+    }
+
+    /* ================= SYSTEM SPECS VIEW ================= */
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .spec-block {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      clip-path: var(--chamfer);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .spec-icon-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .spec-type {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: var(--nitro-crimson);
+      text-transform: uppercase;
+    }
+
+    .spec-val-main {
+      font-size: 15px;
+      font-weight: 800;
+      color: #FFF;
+    }
+
+    .spec-detail {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--tx-secondary);
+      line-height: 1.4;
+    }
+
+    /* Action Buttons */
+    .btn-action-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .btn-tactical {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--tx-primary);
+      font-family: var(--font-ui);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 10px 18px;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all 120ms ease;
+    }
+
+    .btn-tactical:hover {
+      border-color: var(--nitro-crimson);
+      color: var(--nitro-crimson-bright);
+      background: #1A0306;
+    }
+
+    .btn-tactical.primary {
+      background: var(--nitro-crimson);
+      border-color: var(--nitro-crimson);
+      color: #FFF;
+      box-shadow: 0 0 10px rgba(255, 26, 53, 0.3);
+    }
+
+    .btn-tactical.primary:hover {
+      background: var(--nitro-crimson-bright);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= TOP COCKPIT HEADER ================= -->
+  <header>
+    <div class="brand-section">
+      <div class="logo-mark">
+        <span class="logo-nitro">NITRO</span>
+        <span class="logo-man">MAN</span>
+      </div>
+      <div class="hardware-tag">
+        AN515-57<span>•</span>CORE i7-11800H<span>•</span>RTX 3050 Ti<span>•</span>EC V1.20
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('dashboard')">DASHBOARD</button>
+      <button class="tab-btn" onclick="switchTab('fans')">FANS & THERMALS</button>
+      <button class="tab-btn" onclick="switchTab('keyboard')">4-ZONE RGB</button>
+      <button class="tab-btn" onclick="switchTab('specs')">HARDWARE SPECS</button>
+    </nav>
+
+    <div class="header-actions">
+      <div class="status-led">
+        <div class="led-dot"></div>
+        <span>EC ACTIVE</span>
+      </div>
+      <div class="status-led tabular" style="color: var(--tx-dim);">
+        <span>RAM 18.2 MB</span>
+      </div>
+      <button class="btn-hud-toggle" onclick="alert('HUD OSD Overlay toggle trigger')">
+        <span>HUD OSD</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main>
+
+    <!-- VIEW 1: COCKPIT DASHBOARD -->
+    <div class="view-panel active" id="view-dashboard">
+      
+      <!-- Top Section: Gauges + Quick Control Matrix -->
+      <div class="dashboard-grid">
+        
+        <!-- DUAL PURE VECTOR SVG TACHOMETERS -->
+        <div class="gauges-container">
+          
+          <!-- CPU Tachometer -->
+          <div class="gauge-card">
+            <div class="card-header" style="width: 100%;">
+              <span class="card-title">CPU CLUSTER</span>
+              <span class="card-meta">CORE i7-11800H</span>
+            </div>
+
+            <div class="gauge-svg-wrap">
+              <svg class="gauge-svg" viewBox="0 0 200 170">
+                <defs>
+                  <!-- Dial Arc Gradient -->
+                  <linearGradient id="cpuArcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#8A0A18" />
+                    <stop offset="65%" stop-color="#FF1A35" />
+                    <stop offset="100%" stop-color="#FF4D64" />
+                  </linearGradient>
+                  <!-- Needle Glow Filter -->
+                  <filter id="needleGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#FF1A35" flood-opacity="0.8"/>
+                  </filter>
+                </defs>
+
+                <!-- Outer Background Track Arc (270 deg) -->
+                <path d="M 35 140 A 75 75 0 1 1 165 140" fill="none" stroke="#161A24" stroke-width="8" stroke-linecap="round"/>
+
+                <!-- Engraved Tick Marks -->
+                <!-- 1000 RPM -->
+                <line x1="38" y1="130" x2="46" y2="124" stroke="#454F63" stroke-width="1.5"/>
+                <!-- 2000 RPM -->
+                <line x1="42" y1="75" x2="52" y2="78" stroke="#454F63" stroke-width="1.5"/>
+                <!-- 3000 RPM -->
+                <line x1="85" y1="36" x2="88" y2="46" stroke="#454F63" stroke-width="1.5"/>
+                <!-- 4000 RPM -->
+                <line x1="140" y1="52" x2="133" y2="60" stroke="#454F63" stroke-width="1.5"/>
+                <!-- 5000 RPM -->
+                <line x1="160" y1="105" x2="150" y2="102" stroke="#454F63" stroke-width="1.5"/>
+                <!-- MAX -->
+                <line x1="162" y1="140" x2="152" y2="134" stroke="#FF1A35" stroke-width="2"/>
+
+                <!-- Active Crimson Speedometer Arc -->
+                <path id="cpuGaugeArc" d="M 35 140 A 75 75 0 1 1 145 48" fill="none" stroke="url(#cpuArcGrad)" stroke-width="8" stroke-linecap="round" />
+
+                <!-- Center Precision Rotating Turbine Hub -->
+                <g transform="translate(100, 100)">
+                  <circle cx="0" cy="0" r="26" fill="#0C0E14" stroke="#252C3A" stroke-width="1.5"/>
+                  <!-- Vector Turbine Blades -->
+                  <path d="M 0 -22 C 4 -14, 8 -8, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <path d="M 22 0 C 14 4, 8 8, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <path d="M 0 22 C -4 14, -8 8, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <path d="M -22 0 C -14 -4, -8 -8, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <path d="M 15 -15 C 10 -6, 6 -4, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <path d="M 15 15 C 6 10, 4 6, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <path d="M -15 15 C -10 6, -6 4, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <path d="M -15 -15 C -6 -10, -4 -6, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <circle cx="0" cy="0" r="10" fill="#141822" stroke="#FF1A35" stroke-width="1.5"/>
+                </g>
+
+                <!-- Tapered Vector Needle -->
+                <g transform="translate(100, 100) rotate(42)" id="cpuNeedleGroup">
+                  <polygon points="-2.5,0 0,-68 2.5,0" fill="#FF1A35" filter="url(#needleGlow)"/>
+                  <circle cx="0" cy="0" r="4.5" fill="#FFF"/>
+                </g>
+              </svg>
+
+              <!-- Central Digital Readout -->
+              <div class="gauge-center-readout">
+                <div class="gauge-temp-val"><span id="liveCpuT">58</span><span class="gauge-temp-unit">&deg;C</span></div>
+                <div class="gauge-label"><span id="liveCpuR">3658</span> RPM</div>
+              </div>
+            </div>
+
+            <!-- 4-Box Telemetry Strip -->
+            <div class="telemetry-strip">
+              <div class="telem-box">
+                <span class="telem-label">LOAD</span>
+                <span class="telem-val tabular" id="liveCpuLoad">14<small>%</small></span>
+              </div>
+              <div class="telem-box">
+                <span class="telem-label">CLOCK</span>
+                <span class="telem-val tabular" id="liveCpuClock">4.1<small>GHz</small></span>
+              </div>
+              <div class="telem-box">
+                <span class="telem-label">POWER</span>
+                <span class="telem-val tabular" id="liveCpuPwr">42.5<small>W</small></span>
+              </div>
+              <div class="telem-box">
+                <span class="telem-label">PEAK</span>
+                <span class="telem-val tabular" id="liveCpuPeak">74<small>&deg;C</small></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- GPU Tachometer -->
+          <div class="gauge-card">
+            <div class="card-header" style="width: 100%;">
+              <span class="card-title">GPU CLUSTER</span>
+              <span class="card-meta">RTX 3050 Ti LAPTOP</span>
+            </div>
+
+            <div class="gauge-svg-wrap">
+              <svg class="gauge-svg" viewBox="0 0 200 170">
+                <!-- Outer Background Track Arc (270 deg) -->
+                <path d="M 35 140 A 75 75 0 1 1 165 140" fill="none" stroke="#161A24" stroke-width="8" stroke-linecap="round"/>
+
+                <!-- Engraved Tick Marks -->
+                <line x1="38" y1="130" x2="46" y2="124" stroke="#454F63" stroke-width="1.5"/>
+                <line x1="42" y1="75" x2="52" y2="78" stroke="#454F63" stroke-width="1.5"/>
+                <line x1="85" y1="36" x2="88" y2="46" stroke="#454F63" stroke-width="1.5"/>
+                <line x1="140" y1="52" x2="133" y2="60" stroke="#454F63" stroke-width="1.5"/>
+                <line x1="160" y1="105" x2="150" y2="102" stroke="#454F63" stroke-width="1.5"/>
+                <line x1="162" y1="140" x2="152" y2="134" stroke="#FF1A35" stroke-width="2"/>
+
+                <!-- Active Crimson Speedometer Arc -->
+                <path id="gpuGaugeArc" d="M 35 140 A 75 75 0 1 1 135 44" fill="none" stroke="url(#cpuArcGrad)" stroke-width="8" stroke-linecap="round" />
+
+                <!-- Center Precision Rotating Turbine Hub -->
+                <g transform="translate(100, 100)">
+                  <circle cx="0" cy="0" r="26" fill="#0C0E14" stroke="#252C3A" stroke-width="1.5"/>
+                  <path d="M 0 -22 C 4 -14, 8 -8, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <path d="M 22 0 C 14 4, 8 8, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <path d="M 0 22 C -4 14, -8 8, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <path d="M -22 0 C -14 -4, -8 -8, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <path d="M 15 -15 C 10 -6, 6 -4, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <path d="M 15 15 C 6 10, 4 6, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <path d="M -15 15 C -10 6, -6 4, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <path d="M -15 -15 C -6 -10, -4 -6, 0 0" fill="none" stroke="#3A4456" stroke-width="2"/>
+                  <circle cx="0" cy="0" r="10" fill="#141822" stroke="#FF1A35" stroke-width="1.5"/>
+                </g>
+
+                <!-- Tapered Vector Needle -->
+                <g transform="translate(100, 100) rotate(28)" id="gpuNeedleGroup">
+                  <polygon points="-2.5,0 0,-68 2.5,0" fill="#FF1A35" filter="url(#needleGlow)"/>
+                  <circle cx="0" cy="0" r="4.5" fill="#FFF"/>
+                </g>
+              </svg>
+
+              <!-- Central Digital Readout -->
+              <div class="gauge-center-readout">
+                <div class="gauge-temp-val"><span id="liveGpuT">52</span><span class="gauge-temp-unit">&deg;C</span></div>
+                <div class="gauge-label"><span id="liveGpuR">3614</span> RPM</div>
+              </div>
+            </div>
+
+            <!-- 4-Box Telemetry Strip -->
+            <div class="telemetry-strip">
+              <div class="telem-box">
+                <span class="telem-label">LOAD</span>
+                <span class="telem-val tabular" id="liveGpuLoad">8<small>%</small></span>
+              </div>
+              <div class="telem-box">
+                <span class="telem-label">CLOCK</span>
+                <span class="telem-val tabular" id="liveGpuClock">1485<small>MHz</small></span>
+              </div>
+              <div class="telem-box">
+                <span class="telem-label">VRAM</span>
+                <span class="telem-val tabular" id="liveGpuVram">826<small>MB</small></span>
+              </div>
+              <div class="telem-box">
+                <span class="telem-label">PEAK</span>
+                <span class="telem-val tabular" id="liveGpuPeak">66<small>&deg;C</small></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: CONTROL MATRIX -->
+        <div class="tactical-card controls-grid">
+          
+          <div class="card-header">
+            <span class="card-title">HARDWARE OPERATION MATRIX</span>
+            <span class="card-meta">ACPI CONTROL ACTIVE</span>
+          </div>
+
+          <!-- Thermal Profile -->
+          <div class="selector-group">
+            <span class="group-label">THERMAL PROFILE MODE</span>
+            <div class="segmented-control">
+              <button class="seg-btn" onclick="setProfile(this, 'quiet')">
+                <span>QUIET</span>
+                <sub>Acoustic Focus</sub>
+              </button>
+              <button class="seg-btn" onclick="setProfile(this, 'balanced')">
+                <span>BALANCED</span>
+                <sub>Adaptive Daily</sub>
+              </button>
+              <button class="seg-btn active" onclick="setProfile(this, 'performance')">
+                <span>PERF</span>
+                <sub>Full Throttle</sub>
+              </button>
+            </div>
+          </div>
+
+          <!-- Fan Control -->
+          <div class="selector-group">
+            <span class="group-label">FAN BEHAVIOR PROFILE</span>
+            <div class="segmented-control">
+              <button class="seg-btn active" onclick="setFanMode(this, 'auto')">
+                <span>AUTO</span>
+                <sub>Firmware Curve</sub>
+              </button>
+              <button class="seg-btn" onclick="setFanMode(this, 'max')">
+                <span>MAX RPM</span>
+                <sub>100% Lock</sub>
+              </button>
+              <button class="seg-btn" onclick="setFanMode(this, 'custom')">
+                <span>CUSTOM</span>
+                <sub>Manual Curve</sub>
+              </button>
+            </div>
+          </div>
+
+          <!-- Heavy-Duty Tactical Switches -->
+          <div class="toggles-list">
+            
+            <div class="toggle-item checked" onclick="toggleSwitch(this)">
+              <div class="toggle-info">
+                <span class="toggle-name">COOLBOOST</span>
+                <span class="toggle-desc">+500 RPM Thermal Ceiling</span>
+              </div>
+              <div class="switch-ui"><div class="switch-knob"></div></div>
+            </div>
+
+            <div class="toggle-item checked" onclick="toggleSwitch(this)">
+              <div class="toggle-info">
+                <span class="toggle-name">BATTERY CARE (80%)</span>
+                <span class="toggle-desc">Charge Health Limiter</span>
+              </div>
+              <div class="switch-ui"><div class="switch-knob"></div></div>
+            </div>
+
+            <div class="toggle-item checked" onclick="toggleSwitch(this)">
+              <div class="toggle-info">
+                <span class="toggle-name">LCD OVERDRIVE</span>
+                <span class="toggle-desc">3ms Fast Panel Response</span>
+              </div>
+              <div class="switch-ui"><div class="switch-knob"></div></div>
+            </div>
+
+            <div class="toggle-item" onclick="toggleSwitch(this)">
+              <div class="toggle-info">
+                <span class="toggle-name">WIN KEY LOCK</span>
+                <span class="toggle-desc">Anti-Interruption Gaming</span>
+              </div>
+              <div class="switch-ui"><div class="switch-knob"></div></div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Bottom Section: Avionics Live Oscilloscope -->
+      <div class="oscilloscope-card">
+        <div class="card-header" style="margin-bottom: 4px; padding-bottom: 4px;">
+          <span class="card-title">AVIONICS TELEMETRY OSCILLOSCOPE (60 SECONDS HISTORY)</span>
+          <span class="card-meta tabular" id="graphStats">
+            CPU: 58&deg;C (42.5W) &bull; GPU: 52&deg;C (1485MHz) &bull; RAM: 9.3/31.8 GB &bull; DISP: 200 Hz
+          </span>
+        </div>
+
+        <div class="oscilloscope-graph">
+          <div class="grid-lines"></div>
+          <svg style="width: 100%; height: 100%; overflow: visible;" id="liveGraphSvg">
+            <polyline id="cpuGraphLine" fill="none" stroke="#FF1A35" stroke-width="2" points="0,50 100,45 200,48 300,40 400,35 500,42 600,38 700,40 800,36 900,42 1000,40" />
+            <polyline id="gpuGraphLine" fill="none" stroke="#7A0A15" stroke-width="1.5" stroke-dasharray="3,3" points="0,55 100,52 200,53 300,50 400,48 500,49 600,48 700,50 800,47 900,48 1000,47" />
+          </svg>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VIEW 2: FANS & THERMALS -->
+    <div class="view-panel" id="view-fans">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <!-- CPU Fan Control Card -->
+        <div class="tactical-card">
+          <div class="card-header">
+            <span class="card-title">CPU BLOWER FAN</span>
+            <span class="card-meta">PRIMARY PROCESSOR COOLING</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0 14px 0;">
+            <div>
+              <div class="tabular" style="font-size: 32px; font-weight: 900; color: #FFF; line-height: 1;">
+                <span id="fansCpuRpm">3658</span> <span style="font-size: 13px; color: var(--tx-secondary); font-weight: 600;">RPM</span>
+              </div>
+              <div style="font-size: 10px; font-weight: 700; color: var(--tx-dim); letter-spacing: 0.05em; margin-top: 4px;">FIRMWARE AUTO-PWM CURVE</div>
+            </div>
+            <div class="seg-control" style="background: rgba(0,0,0,0.4); padding: 2px;">
+              <button class="seg-btn active" onclick="setFanMode(this, 'auto')" style="font-size: 10px; padding: 6px 12px;">AUTO</button>
+              <button class="seg-btn" onclick="setFanMode(this, 'max')" style="font-size: 10px; padding: 6px 12px;">MAX</button>
+              <button class="seg-btn" onclick="setFanMode(this, 'custom')" style="font-size: 10px; padding: 6px 12px;">CUSTOM</button>
+            </div>
+          </div>
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: var(--tx-secondary); margin-bottom: 6px;">
+              <span>PWM SPEED TARGET</span>
+              <span class="tabular">62% (3700 RPM)</span>
+            </div>
+            <input type="range" min="0" max="100" value="62" style="width: 100%; accent-color: var(--nitro-crimson); height: 5px; cursor: pointer;">
+          </div>
+        </div>
+
+        <!-- GPU Fan Control Card -->
+        <div class="tactical-card">
+          <div class="card-header">
+            <span class="card-title">GPU BLOWER FAN</span>
+            <span class="card-meta">SECONDARY GRAPHICS COOLING</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0 14px 0;">
+            <div>
+              <div class="tabular" style="font-size: 32px; font-weight: 900; color: #FFF; line-height: 1;">
+                <span id="fansGpuRpm">3614</span> <span style="font-size: 13px; color: var(--tx-secondary); font-weight: 600;">RPM</span>
+              </div>
+              <div style="font-size: 10px; font-weight: 700; color: var(--tx-dim); letter-spacing: 0.05em; margin-top: 4px;">FIRMWARE AUTO-PWM CURVE</div>
+            </div>
+            <div class="seg-control" style="background: rgba(0,0,0,0.4); padding: 2px;">
+              <button class="seg-btn active" onclick="setFanMode(this, 'auto')" style="font-size: 10px; padding: 6px 12px;">AUTO</button>
+              <button class="seg-btn" onclick="setFanMode(this, 'max')" style="font-size: 10px; padding: 6px 12px;">MAX</button>
+              <button class="seg-btn" onclick="setFanMode(this, 'custom')" style="font-size: 10px; padding: 6px 12px;">CUSTOM</button>
+            </div>
+          </div>
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: var(--tx-secondary); margin-bottom: 6px;">
+              <span>PWM SPEED TARGET</span>
+              <span class="tabular">60% (3600 RPM)</span>
+            </div>
+            <input type="range" min="0" max="100" value="60" style="width: 100%; accent-color: var(--nitro-crimson); height: 5px; cursor: pointer;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Thermal Curve Card -->
+      <div class="tactical-card">
+        <div class="card-header">
+          <span class="card-title">INTERACTIVE THERMAL CURVE PROFILES</span>
+          <span class="card-meta">5-NODE SPLINE • PWM VS TEMPERATURE RATIO</span>
+        </div>
+
+        <div style="height: 220px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-subtle); border-radius: 4px; position: relative;">
+          <div class="grid-lines"></div>
+          <svg style="width: 100%; height: 100%;" viewBox="0 0 800 220">
+            <!-- Axis lines -->
+            <line x1="60" y1="190" x2="760" y2="190" stroke="#333" stroke-width="1"/>
+            <line x1="60" y1="30" x2="60" y2="190" stroke="#333" stroke-width="1"/>
+            
+            <!-- Axis labels -->
+            <text x="30" y="35" fill="#888" font-size="10" font-family="monospace">100%</text>
+            <text x="30" y="112" fill="#888" font-size="10" font-family="monospace">50%</text>
+            <text x="30" y="190" fill="#888" font-size="10" font-family="monospace">0%</text>
+            
+            <text x="60" y="208" fill="#888" font-size="10" font-family="monospace">30&deg;C</text>
+            <text x="235" y="208" fill="#888" font-size="10" font-family="monospace">50&deg;C</text>
+            <text x="410" y="208" fill="#888" font-size="10" font-family="monospace">70&deg;C</text>
+            <text x="585" y="208" fill="#888" font-size="10" font-family="monospace">85&deg;C</text>
+            <text x="740" y="208" fill="#888" font-size="10" font-family="monospace">100&deg;C</text>
+
+            <!-- Grid horizontal dashed lines -->
+            <line x1="60" y1="110" x2="760" y2="110" stroke="#222" stroke-dasharray="3,3" stroke-width="1"/>
+            <line x1="60" y1="30" x2="760" y2="30" stroke="#222" stroke-dasharray="3,3" stroke-width="1"/>
+
+            <!-- Curve Line -->
+            <path d="M 60 175 Q 235 160, 410 110 T 760 45" fill="none" stroke="#FF1A35" stroke-width="2.5"/>
+
+            <!-- Control points -->
+            <circle cx="60" cy="175" r="5" fill="#FFF" stroke="#FF1A35" stroke-width="2" style="cursor: pointer;"/>
+            <circle cx="235" cy="160" r="5" fill="#FFF" stroke="#FF1A35" stroke-width="2" style="cursor: pointer;"/>
+            <circle cx="410" cy="110" r="5" fill="#FFF" stroke="#FF1A35" stroke-width="2" style="cursor: pointer;"/>
+            <circle cx="585" cy="75" r="5" fill="#FFF" stroke="#FF1A35" stroke-width="2" style="cursor: pointer;"/>
+            <circle cx="760" cy="45" r="5" fill="#FFF" stroke="#FF1A35" stroke-width="2" style="cursor: pointer;"/>
+          </svg>
+        </div>
+
+        <div class="btn-action-row" style="margin-top: 12px; justify-content: space-between;">
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-tactical primary">SAVE CUSTOM CURVE</button>
+            <button class="btn-tactical">RESTORE DEFAULT BIOS</button>
+            <button class="btn-tactical">APPLY MAX CEILING (5800 RPM)</button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 11px; font-weight: 700; color: var(--tx-secondary);">COOLBOOST (+500 RPM)</span>
+            <div class="switch-ui checked" onclick="toggleSwitch(this)"><div class="switch-knob"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: 4-ZONE RGB KEYBOARD -->
+    <div class="view-panel" id="view-keyboard">
+      <div class="keyboard-preview-container">
+        <div class="card-header" style="border: none; margin: 0; padding: 0;">
+          <span class="card-title">4-ZONE KEYBOARD ILLUMINATION ENGINE</span>
+          <span class="card-meta">HARDWARE EC COMMAND 28 & 17</span>
+        </div>
+
+        <!-- 1:1 Vector Chiclet Deck Preview -->
+        <div class="keyboard-deck-frame">
+          <svg class="keyboard-grid-svg" viewBox="0 0 900 240">
+            <!-- Zone 1: Left / WASD -->
+            <rect x="15" y="15" width="200" height="210" rx="4" fill="#131722" stroke="rgba(255, 26, 53, 0.4)" stroke-width="1.5" />
+            <text x="115" y="35" text-anchor="middle" fill="#FF1A35" font-size="11" font-weight="800" font-family="sans-serif">ZONE 1 (WASD)</text>
+            <!-- Keycaps -->
+            <rect x="25" y="50" width="30" height="30" rx="3" fill="#1E2330" stroke="#333"/>
+            <rect x="65" y="50" width="30" height="30" rx="3" fill="#1E2330" stroke="#333"/>
+            <rect x="105" y="50" width="30" height="30" rx="3" fill="#1E2330" stroke="#333"/>
+            <rect x="145" y="50" width="30" height="30" rx="3" fill="#1E2330" stroke="#333"/>
+            
+            <!-- WASD highlighted keycaps -->
+            <rect x="85" y="90" width="35" height="35" rx="3" fill="#3A080E" stroke="#FF1A35" stroke-width="2"/>
+            <text x="102" y="112" text-anchor="middle" fill="#FFF" font-weight="900" font-size="14">W</text>
+            <rect x="45" y="130" width="35" height="35" rx="3" fill="#3A080E" stroke="#FF1A35" stroke-width="2"/>
+            <text x="62" y="152" text-anchor="middle" fill="#FFF" font-weight="900" font-size="14">A</text>
+            <rect x="85" y="130" width="35" height="35" rx="3" fill="#3A080E" stroke="#FF1A35" stroke-width="2"/>
+            <text x="102" y="152" text-anchor="middle" fill="#FFF" font-weight="900" font-size="14">S</text>
+            <rect x="125" y="130" width="35" height="35" rx="3" fill="#3A080E" stroke="#FF1A35" stroke-width="2"/>
+            <text x="142" y="152" text-anchor="middle" fill="#FFF" font-weight="900" font-size="14">D</text>
+
+            <!-- Zone 2: Mid-Left -->
+            <rect x="225" y="15" width="200" height="210" rx="4" fill="#131722" stroke="rgba(255, 26, 53, 0.4)" stroke-width="1.5" />
+            <text x="325" y="35" text-anchor="middle" fill="#FF1A35" font-size="11" font-weight="800" font-family="sans-serif">ZONE 2</text>
+            <!-- Grid of keys -->
+            <g fill="#1E2330" stroke="#333">
+              <rect x="235" y="50" width="30" height="30" rx="3"/>
+              <rect x="275" y="50" width="30" height="30" rx="3"/>
+              <rect x="315" y="50" width="30" height="30" rx="3"/>
+              <rect x="355" y="50" width="30" height="30" rx="3"/>
+              <rect x="235" y="90" width="30" height="30" rx="3"/>
+              <rect x="275" y="90" width="30" height="30" rx="3"/>
+              <rect x="315" y="90" width="30" height="30" rx="3"/>
+              <rect x="355" y="90" width="30" height="30" rx="3"/>
+              <rect x="235" y="130" width="30" height="30" rx="3"/>
+              <rect x="275" y="130" width="30" height="30" rx="3"/>
+              <rect x="315" y="130" width="30" height="30" rx="3"/>
+              <rect x="355" y="130" width="30" height="30" rx="3"/>
+            </g>
+
+            <!-- Zone 3: Mid-Right & Arrow Keys -->
+            <rect x="435" y="15" width="200" height="210" rx="4" fill="#131722" stroke="rgba(255, 26, 53, 0.4)" stroke-width="1.5" />
+            <text x="535" y="35" text-anchor="middle" fill="#FF1A35" font-size="11" font-weight="800" font-family="sans-serif">ZONE 3 (ARROWS)</text>
+            <!-- Keys + Arrow keys -->
+            <g fill="#1E2330" stroke="#333">
+              <rect x="445" y="50" width="30" height="30" rx="3"/>
+              <rect x="485" y="50" width="30" height="30" rx="3"/>
+              <rect x="525" y="50" width="30" height="30" rx="3"/>
+              <rect x="565" y="50" width="30" height="30" rx="3"/>
+              <rect x="445" y="90" width="30" height="30" rx="3"/>
+              <rect x="485" y="90" width="30" height="30" rx="3"/>
+              <rect x="525" y="90" width="30" height="30" rx="3"/>
+              <rect x="565" y="90" width="30" height="30" rx="3"/>
+              
+              <!-- Offset Arrow Keys -->
+              <rect x="540" y="135" width="32" height="32" rx="3" stroke="#888"/>
+              <text x="556" y="155" text-anchor="middle" fill="#AAA" font-size="12">&uarr;</text>
+              <rect x="500" y="175" width="32" height="32" rx="3" stroke="#888"/>
+              <text x="516" y="195" text-anchor="middle" fill="#AAA" font-size="12">&larr;</text>
+              <rect x="540" y="175" width="32" height="32" rx="3" stroke="#888"/>
+              <text x="556" y="195" text-anchor="middle" fill="#AAA" font-size="12">&darr;</text>
+              <rect x="580" y="175" width="32" height="32" rx="3" stroke="#888"/>
+              <text x="596" y="195" text-anchor="middle" fill="#AAA" font-size="12">&rarr;</text>
+            </g>
+
+            <!-- Zone 4: Numpad & Nitro Key -->
+            <rect x="645" y="15" width="240" height="210" rx="4" fill="#131722" stroke="rgba(255, 26, 53, 0.4)" stroke-width="1.5" />
+            <text x="765" y="35" text-anchor="middle" fill="#FF1A35" font-size="11" font-weight="800" font-family="sans-serif">ZONE 4 (NUMPAD & NITRO)</text>
+            <!-- Special Nitro Key [N] -->
+            <rect x="655" y="50" width="38" height="35" rx="3" fill="#3A080E" stroke="#FF1A35" stroke-width="2"/>
+            <text x="674" y="73" text-anchor="middle" fill="#FFF" font-weight="900" font-size="16">N</text>
+
+            <!-- Numpad grid -->
+            <g fill="#1E2330" stroke="#333">
+              <rect x="705" y="50" width="30" height="30" rx="3"/>
+              <rect x="745" y="50" width="30" height="30" rx="3"/>
+              <rect x="785" y="50" width="30" height="30" rx="3"/>
+              <rect x="655" y="95" width="30" height="30" rx="3"/>
+              <rect x="695" y="95" width="30" height="30" rx="3"/>
+              <rect x="735" y="95" width="30" height="30" rx="3"/>
+              <rect x="775" y="95" width="30" height="30" rx="3"/>
+              <rect x="655" y="135" width="30" height="30" rx="3"/>
+              <rect x="695" y="135" width="30" height="30" rx="3"/>
+              <rect x="735" y="135" width="30" height="30" rx="3"/>
+              <rect x="775" y="135" width="30" height="30" rx="3"/>
+            </g>
+          </svg>
+        </div>
+
+        <!-- 4-Zone Color Selection Cards -->
+        <div class="rgb-zones-selector">
+          <div class="zone-card active">
+            <div class="zone-header">
+              <span class="zone-name">ZONE 1 (WASD)</span>
+              <div class="zone-color-indicator" style="background: #FF1A35; color: #FF1A35;"></div>
+            </div>
+            <input type="color" value="#FF1A35" style="width: 100%; height: 26px; border: none; background: transparent; cursor: pointer;">
+          </div>
+          <div class="zone-card">
+            <div class="zone-header">
+              <span class="zone-name">ZONE 2</span>
+              <div class="zone-color-indicator" style="background: #FF1A35; color: #FF1A35;"></div>
+            </div>
+            <input type="color" value="#FF1A35" style="width: 100%; height: 26px; border: none; background: transparent; cursor: pointer;">
+          </div>
+          <div class="zone-card">
+            <div class="zone-header">
+              <span class="zone-name">ZONE 3 (ARROWS)</span>
+              <div class="zone-color-indicator" style="background: #FF1A35; color: #FF1A35;"></div>
+            </div>
+            <input type="color" value="#FF1A35" style="width: 100%; height: 26px; border: none; background: transparent; cursor: pointer;">
+          </div>
+          <div class="zone-card">
+            <div class="zone-header">
+              <span class="zone-name">ZONE 4 (NUMPAD)</span>
+              <div class="zone-color-indicator" style="background: #FF1A35; color: #FF1A35;"></div>
+            </div>
+            <input type="color" value="#FF1A35" style="width: 100%; height: 26px; border: none; background: transparent; cursor: pointer;">
+          </div>
+        </div>
+
+        <!-- Sliders: Brightness & Speed -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px;">
+          <div style="background: var(--bg-card); padding: 10px 14px; border-radius: 4px; border: 1px solid var(--border-subtle);">
+            <div style="display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: var(--tx-secondary); margin-bottom: 6px;">
+              <span>KEYBOARD BRIGHTNESS</span>
+              <span class="tabular">100% (HIGH)</span>
+            </div>
+            <input type="range" min="0" max="100" value="100" style="width: 100%; accent-color: var(--nitro-crimson); height: 4px; cursor: pointer;">
+          </div>
+          <div style="background: var(--bg-card); padding: 10px 14px; border-radius: 4px; border: 1px solid var(--border-subtle);">
+            <div style="display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: var(--tx-secondary); margin-bottom: 6px;">
+              <span>EFFECT DYNAMICS SPEED</span>
+              <span class="tabular">SPEED 5 (MEDIUM)</span>
+            </div>
+            <input type="range" min="1" max="9" value="5" style="width: 100%; accent-color: var(--nitro-crimson); height: 4px; cursor: pointer;">
+          </div>
+        </div>
+
+        <!-- 12 RGB Modes Matrix -->
+        <div class="rgb-modes-matrix" style="margin-top: 10px;">
+          <div class="mode-chip active">STATIC</div>
+          <div class="mode-chip">BREATHING</div>
+          <div class="mode-chip">WAVE</div>
+          <div class="mode-chip">ZOOM</div>
+          <div class="mode-chip">SHIFTING</div>
+          <div class="mode-chip">NEON</div>
+          <div class="mode-chip">STROBE</div>
+          <div class="mode-chip">CHASE</div>
+          <div class="mode-chip">POLICE</div>
+          <div class="mode-chip">THERMAL</div>
+          <div class="mode-chip">TYPING WAVE</div>
+          <div class="mode-chip">OFF</div>
+        </div>
+
+        <!-- Actions -->
+        <div class="btn-action-row" style="margin-top: 10px;">
+          <button class="btn-tactical primary">APPLY ALL 4 ZONES</button>
+          <button class="btn-tactical">SYNC FROM NITROSENSE</button>
+          <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 11px; font-weight: 700; color: var(--tx-secondary);">BACKLIGHT SLEEP (30s)</span>
+            <div class="switch-ui checked" onclick="toggleSwitch(this)" style="transform: scale(0.85);"><div class="switch-knob"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: SYSTEM SPECS (CAD ARCHITECTURE BLUEPRINT) -->
+    <div class="view-panel" id="view-specs">
+      <div class="tactical-card">
+        <div class="card-header">
+          <span class="card-title">HARDWARE ARCHITECTURE SPECIFICATIONS</span>
+          <span class="card-meta">ACER NITRO 5 AN515-57-75A3</span>
+        </div>
+
+        <div class="specs-grid">
+          <!-- CPU -->
+          <div class="spec-block">
+            <div class="spec-icon-row">
+              <span class="spec-type">PROCESSOR</span>
+              <span class="card-meta">8C / 16T</span>
+            </div>
+            <div class="spec-val-main">Intel Core i7-11800H</div>
+            <div class="spec-detail">
+              Architecture: Tiger Lake-H45 10nm SuperFin<br>
+              Base: 2.30 GHz &bull; Turbo: Up to 4.60 GHz<br>
+              L3 Cache: 24 MB &bull; TDP: 45W (PL2: 80W)
+            </div>
+          </div>
+
+          <!-- GPU -->
+          <div class="spec-block">
+            <div class="spec-icon-row">
+              <span class="spec-type">DISCRETE GRAPHICS</span>
+              <span class="card-meta">GA107-400</span>
+            </div>
+            <div class="spec-val-main">NVIDIA GeForce RTX 3050 Ti</div>
+            <div class="spec-detail">
+              VRAM: 4096 MB GDDR6 (128-bit bus)<br>
+              TGP: 60W (Dynamic Boost 75W)<br>
+              Driver: 566.14 DCH &bull; Resizable BAR: Active
+            </div>
+          </div>
+
+          <!-- RAM -->
+          <div class="spec-block">
+            <div class="spec-icon-row">
+              <span class="spec-type">SYSTEM MEMORY</span>
+              <span class="card-meta">DUAL-CHANNEL</span>
+            </div>
+            <div class="spec-val-main">32 GB DDR4-3200</div>
+            <div class="spec-detail">
+              Modules: 2x 16 GB SK Hynix SODIMM<br>
+              Speed: 3200 MT/s (CL22)<br>
+              Active Usage: 9.3 GB (29% Loaded)
+            </div>
+          </div>
+
+          <!-- NVMe SSD 1 -->
+          <div class="spec-block">
+            <div class="spec-icon-row">
+              <span class="spec-type">STORAGE 1 (NVMe OS)</span>
+              <span class="card-meta" style="color: var(--nitro-crimson);">42&deg;C LIVE</span>
+            </div>
+            <div class="spec-val-main">SK Hynix HFM512GD3JX016N</div>
+            <div class="spec-detail">
+              Capacity: 512 GB &bull; PCIe 3.0 x4 M.2 NVMe<br>
+              Partitions: [C: System] / [D: Data]<br>
+              SMART Health: 99% Good &bull; NVMe 1.3
+            </div>
+          </div>
+
+          <!-- NVMe SSD 2 -->
+          <div class="spec-block">
+            <div class="spec-icon-row">
+              <span class="spec-type">STORAGE 2 (NVMe GAMES)</span>
+              <span class="card-meta" style="color: var(--nitro-crimson);">38&deg;C LIVE</span>
+            </div>
+            <div class="spec-val-main">TeamGroup TM8FP6512G</div>
+            <div class="spec-detail">
+              Capacity: 512 GB &bull; PCIe 3.0 x4 M.2 NVMe<br>
+              Partition: [F: Steam Library]<br>
+              SMART Health: 100% Good
+            </div>
+          </div>
+
+          <!-- SATA HDD 3 -->
+          <div class="spec-block">
+            <div class="spec-icon-row">
+              <span class="spec-type">STORAGE 3 (SATA HDD)</span>
+              <span class="card-meta" style="color: var(--nitro-crimson);">34&deg;C LIVE</span>
+            </div>
+            <div class="spec-val-main">HGST Travelstar 7K1000</div>
+            <div class="spec-detail">
+              Capacity: 1000 GB &bull; SATA III 6 Gb/s<br>
+              Speed: 7200 RPM &bull; 32MB Cache<br>
+              Partition: [E: Media Archive]
+            </div>
+          </div>
+
+          <!-- DISPLAY & PANEL -->
+          <div class="spec-block">
+            <div class="spec-icon-row">
+              <span class="spec-type">DISPLAY PANEL</span>
+              <span class="card-meta">144 HZ REFRESH</span>
+            </div>
+            <div class="spec-val-main">15.6" IPS Full HD</div>
+            <div class="spec-detail">
+              Resolution: 1920 &times; 1080 (16:9)<br>
+              Color Gamut: 45% NTSC &bull; Matte Anti-Glare<br>
+              LCD Overdrive: 3ms Fast Response Supported
+            </div>
+          </div>
+
+          <!-- POWER & BATTERY -->
+          <div class="spec-block">
+            <div class="spec-icon-row">
+              <span class="spec-type">POWER SUBSYSTEM</span>
+              <span class="card-meta">230W ADAPTER</span>
+            </div>
+            <div class="spec-val-main">57.5 Wh 4-Cell Li-ion</div>
+            <div class="spec-detail">
+              Health: 94% (54,038 / 57,488 mWh)<br>
+              Status: AC Plugged In (100% / Limiter at 80%)<br>
+              Power Delivery: AC Only (Barrel Jack 19.5V)
+            </div>
+          </div>
+
+          <!-- MOTHERBOARD & EC -->
+          <div class="spec-block">
+            <div class="spec-icon-row">
+              <span class="spec-type">PLATFORM ARCHITECTURE</span>
+              <span class="card-meta">CHIPSET HM570</span>
+            </div>
+            <div class="spec-val-main">Acer Nitro AN515-57</div>
+            <div class="spec-detail">
+              BIOS Version: InsydeH2O V1.20<br>
+              EC Controller: IT8291 (Firmware V1.20)<br>
+              Networking: Killer E2600 + Wi-Fi 6 AX201
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-action-row" style="margin-top: 14px;">
+          <button class="btn-tactical primary" onclick="alert('TRIM commands executed across all NVMe slots')">OPTIMIZE DRIVES (TRIM)</button>
+          <button class="btn-tactical" onclick="alert('Standby memory cache cleared (1.8 GB freed)')">FLUSH STANDBY RAM</button>
+          <button class="btn-tactical" onclick="alert('Temporary Windows cache purged (480 MB freed)')">CLEAN TEMP FILES</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Script for Navigation & Live Simulation -->
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+      
+      const tabMap = {
+        'dashboard': 0,
+        'cockpit': 0,
+        'fans': 1,
+        'thermal': 1,
+        'keyboard': 2,
+        'rgb': 2,
+        'specs': 3
+      };
+      const cleanId = (tabId || '').toLowerCase().trim();
+      const idx = tabMap[cleanId] !== undefined ? tabMap[cleanId] : 0;
+      const allBtns = document.querySelectorAll('.tab-btn');
+      if (allBtns[idx]) allBtns[idx].classList.add('active');
+
+      const targetId = ['view-dashboard', 'view-fans', 'view-keyboard', 'view-specs'][idx];
+      const targetView = document.getElementById(targetId);
+      if (targetView) targetView.classList.add('active');
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialTab = urlParams.get('tab') || (window.location.hash ? window.location.hash.substring(1) : null);
+    if (initialTab) {
+      switchTab(initialTab);
+    }
+
+    function setProfile(btn, prof) {
+      btn.parentElement.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function setFanMode(btn, mode) {
+      btn.parentElement.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function toggleSwitch(item) {
+      item.classList.toggle('checked');
+    }
+
+    // Live Telemetry Simulation Engine for Browser Preview
+    (function initSimulator() {
+      let t = 0;
+      setInterval(() => {
+        t += 0.1;
+        const cpuTemp = Math.round(56 + Math.sin(t * 0.8) * 6 + Math.random() * 2);
+        const gpuTemp = Math.round(50 + Math.cos(t * 0.6) * 4 + Math.random() * 2);
+        const cpuRpm = Math.round(3500 + Math.sin(t * 0.7) * 300);
+        const gpuRpm = Math.round(3450 + Math.cos(t * 0.5) * 250);
+        const cpuClock = (3.8 + Math.sin(t * 1.2) * 0.5).toFixed(1);
+
+        document.getElementById('liveCpuT').textContent = cpuTemp;
+        document.getElementById('liveGpuT').textContent = gpuTemp;
+        document.getElementById('liveCpuR').textContent = cpuRpm;
+        document.getElementById('liveGpuR').textContent = gpuRpm;
+        document.getElementById('liveCpuClock').innerHTML = cpuClock + '<small>GHz</small>';
+
+        // Needle rotation
+        // 30 deg = 30 C, 240 deg = 100 C
+        const cpuAngle = 20 + ((cpuTemp - 30) / 70) * 200;
+        const gpuAngle = 20 + ((gpuTemp - 30) / 70) * 200;
+        document.getElementById('cpuNeedleGroup').setAttribute('transform', `translate(100, 100) rotate(${cpuAngle})`);
+        document.getElementById('gpuNeedleGroup').setAttribute('transform', `translate(100, 100) rotate(${gpuAngle})`);
+      }, 1000);
+    })();
+  </script>
+</body>
+</html>

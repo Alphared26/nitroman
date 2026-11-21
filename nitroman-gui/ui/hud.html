@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>NitroMan OSD Telemetry</title>
+  <link rel="icon" href="assets/nitroman_icon.ico">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&display=swap');
+
+    :root {
+      --rtss-green: #00E676;
+      --rtss-cyan: #00D2FF;
+      --rtss-amber: #FF8C00;
+      --rtss-yellow: #FFD600;
+      --rtss-pink: #FF4081;
+      --rtss-white: #FFFFFF;
+      --rtss-dim: #7E8B9B;
+      --rtss-unit: #D2DCE6;
+      --rtss-bg: rgba(4, 6, 8, 0.84);
+      --rtss-border: rgba(255, 255, 255, 0.09);
+      --hud-scale: 1.0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+    }
+
+    /* Pure In-game RTSS OSD Overlay (Frameless, Draggable, Resizable) */
+    .rtss-hud-frame {
+      width: 100%;
+      height: 100%;
+      background: var(--rtss-bg);
+      border: 1px solid var(--rtss-border);
+      border-radius: 6px;
+      box-shadow:
+        0 14px 32px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(0, 0, 0, 0.95),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 10px 14px 8px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      position: relative;
+      cursor: grab;
+      -webkit-app-region: drag;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .rtss-hud-frame::-webkit-scrollbar {
+      width: 4px;
+    }
+    .rtss-hud-frame::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+    }
+
+    .rtss-hud-frame:active {
+      cursor: grabbing;
+    }
+
+    /* Top Floating Controls (Gear & Hide) */
+    .hud-controls {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      display: flex;
+      gap: 6px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      z-index: 100;
+      -webkit-app-region: no-drag;
+    }
+
+    .rtss-hud-frame:hover .hud-controls {
+      opacity: 1;
+    }
+
+    .hud-btn {
+      background: rgba(20, 24, 30, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #A0AAB8;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+
+    .hud-btn:hover {
+      background: #E4002B;
+      color: #FFF;
+      border-color: #E4002B;
+    }
+
+    /* Content Body */
+    .rtss-body {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+      transform-origin: top left;
+    }
+
+    .rtss-row {
+      display: grid;
+      grid-template-columns: 56px 74px 80px 86px 64px 1fr;
+      align-items: baseline;
+      line-height: 1.35;
+      font-size: calc(14.5px * var(--hud-scale));
+      letter-spacing: 0.15px;
+      white-space: nowrap;
+      min-width: 0;
+    }
+
+    .rtss-tag {
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .tag-gpu,
+    .tag-mem {
+      color: var(--rtss-green);
+      text-shadow: 0 0 6px rgba(0, 230, 118, 0.45);
+    }
+
+    .tag-cpu,
+    .tag-ram {
+      color: var(--rtss-cyan);
+      text-shadow: 0 0 6px rgba(0, 210, 255, 0.45);
+    }
+
+    .tag-ssd {
+      color: var(--rtss-amber);
+      text-shadow: 0 0 6px rgba(255, 140, 0, 0.45);
+    }
+
+    .tag-hdd {
+      color: var(--rtss-yellow);
+      text-shadow: 0 0 6px rgba(255, 214, 0, 0.45);
+    }
+
+    .tag-fps {
+      color: var(--rtss-pink);
+      text-shadow: 0 0 6px rgba(255, 64, 129, 0.45);
+    }
+
+    .metric-group {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 3px;
+    }
+
+    .num-amber {
+      color: var(--rtss-amber);
+      font-size: calc(15.5px * var(--hud-scale));
+      font-weight: 800;
+      text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.95);
+      letter-spacing: -0.2px;
+    }
+
+    .num-white {
+      color: #FFFFFF;
+      font-size: calc(15.5px * var(--hud-scale));
+      font-weight: 800;
+      text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.95);
+      letter-spacing: -0.2px;
+    }
+
+    .unit {
+      color: var(--rtss-unit);
+      font-size: calc(10.5px * var(--hud-scale));
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    .sub-note {
+      color: var(--rtss-dim);
+      font-size: calc(11px * var(--hud-scale));
+      font-weight: 600;
+      text-align: right;
+      letter-spacing: 0.2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+      padding-left: 6px;
+    }
+
+    .span-3 {
+      grid-column: span 3;
+    }
+
+    .span-4 {
+      grid-column: span 4;
+    }
+
+    .rtss-divider {
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+      margin: 2px 0;
+    }
+
+    /* Resize Grip Handle at Bottom Right */
+    .hud-resize-handle {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 14px;
+      height: 14px;
+      cursor: se-resize;
+      -webkit-app-region: no-drag;
+      opacity: 0.35;
+      transition: opacity 0.2s ease;
+    }
+
+    .hud-resize-handle::after {
+      content: '';
+      position: absolute;
+      right: 3px;
+      bottom: 3px;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid #A0AAB8;
+      border-bottom: 2px solid #A0AAB8;
+    }
+
+    .rtss-hud-frame:hover .hud-resize-handle {
+      opacity: 0.9;
+    }
+
+    /* In-Widget Settings Drawer Modal */
+    .hud-settings-modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(8, 10, 14, 0.96);
+      border-radius: 6px;
+      padding: 14px 18px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 200;
+      -webkit-app-region: no-drag;
+      overflow-y: auto;
+    }
+
+    .hud-settings-modal.active {
+      display: flex;
+    }
+
+    .settings-title {
+      color: #FFF;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 6px;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 14px;
+      margin-top: 4px;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #C0C8D2;
+      cursor: pointer;
+    }
+
+    .setting-item input[type="checkbox"] {
+      cursor: pointer;
+      accent-color: #E4002B;
+      width: 14px;
+      height: 14px;
+    }
+
+    .slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #8A94A0;
+      font-weight: 700;
+    }
+
+    .slider-row input[type="range"] {
+      accent-color: #00D2FF;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .settings-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 6px;
+    }
+
+    .btn-save {
+      background: #E4002B;
+      color: #FFF;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 14px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-save:hover {
+      background: #FF1A44;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="rtss-hud-frame" id="hudContainer" data-tauri-drag-region>
+    
+    <!-- Top Floating Controls -->
+    <div class="hud-controls" id="hudControls">
+      <button class="hud-btn" id="btnSettings" title="HUD Telemetry Settings">SETTINGS</button>
+      <button class="hud-btn" id="btnHide" title="Hide HUD (Toggle via NitroMan)">X</button>
+    </div>
+
+    <!-- Main Telemetry Body -->
+    <div class="rtss-body" id="rtssBody">
+
+      <!-- ROW 1: GPU -->
+      <div class="rtss-row" id="rowGpu">
+        <span class="rtss-tag tag-gpu">GPU</span>
+        <span class="metric-group"><b class="num-amber" id="gpuTemp">52</b><span class="unit">&deg;C</span></span>
+        <span class="metric-group"><b class="num-amber" id="gpuLoad">0</b><span class="unit">%</span></span>
+        <span class="metric-group"><b class="num-amber" id="gpuClock">1485</b><span class="unit">MHz</span></span>
+        <span class="metric-group"><b class="num-amber" id="gpuFan">45</b><span class="unit">%</span></span>
+        <span></span>
+      </div>
+
+      <!-- ROW 2: MEM (VRAM) -->
+      <div class="rtss-row" id="rowMem">
+        <span class="rtss-tag tag-mem">MEM</span>
+        <span class="metric-group"><b class="num-amber" id="vramUsed">1420</b><span class="unit">MB</span></span>
+        <span class="metric-group"><b class="num-amber" id="vramClock">6000</b><span class="unit">MHz</span></span>
+        <span class="sub-note span-3" id="gpuModel">RTX 3050 (4 GB)</span>
+      </div>
+
+      <!-- ROW 3: CPU -->
+      <div class="rtss-row" id="rowCpu">
+        <span class="rtss-tag tag-cpu">CPU</span>
+        <span class="metric-group"><b class="num-amber" id="cpuTemp">58</b><span class="unit">&deg;C</span></span>
+        <span class="metric-group"><b class="num-amber" id="cpuLoad">12</b><span class="unit">%</span></span>
+        <span class="metric-group"><b class="num-amber" id="cpuClock">4200</b><span class="unit">MHz</span></span>
+        <span class="metric-group"><b class="num-amber" id="cpuPwr">45.0</b><span class="unit">W</span></span>
+        <span></span>
+      </div>
+
+      <!-- ROW 4: RAM -->
+      <div class="rtss-row" id="rowRam">
+        <span class="rtss-tag tag-ram">RAM</span>
+        <span class="metric-group"><b class="num-amber" id="ramUsed">9487</b><span class="unit">MB</span></span>
+        <span class="metric-group"><b class="num-amber" id="ramLoad">29</b><span class="unit">%</span></span>
+        <span class="sub-note span-3" id="ramTotalTxt">32 GB Dual-Channel</span>
+      </div>
+
+      <div class="rtss-divider" id="dividerStorage"></div>
+
+      <!-- DYNAMIC STORAGE ROWS CONTAINER -->
+      <div id="storageRows" style="display: flex; flex-direction: column; gap: 4px;">
+        <div class="rtss-row">
+          <span class="rtss-tag tag-ssd">SSD 1</span>
+          <span class="metric-group"><b class="num-amber">42</b><span class="unit">&deg;C</span></span>
+          <span class="sub-note span-4">SK Hynix NVMe 512GB [C: / D:]</span>
+        </div>
+        <div class="rtss-row">
+          <span class="rtss-tag tag-ssd">SSD 2</span>
+          <span class="metric-group"><b class="num-amber">38</b><span class="unit">&deg;C</span></span>
+          <span class="sub-note span-4">TeamGroup NVMe 512GB [F:]</span>
+        </div>
+        <div class="rtss-row">
+          <span class="rtss-tag tag-hdd">HDD</span>
+          <span class="metric-group"><b class="num-amber">34</b><span class="unit">&deg;C</span></span>
+          <span class="sub-note span-4">HGST SATA 1TB 7200 RPM [E:]</span>
+        </div>
+      </div>
+
+      <div class="rtss-divider" id="dividerFps"></div>
+
+      <!-- ROW 8: In-game FPS / Display -->
+      <div class="rtss-row" id="rowFps">
+        <span class="rtss-tag tag-fps">FPS</span>
+        <span class="metric-group"><b class="num-white" id="fpsVal">--</b><span class="unit">FPS</span></span>
+        <span class="sub-note span-4" id="displayTxt">Mi Gaming Display (200 Hz) [Desktop]</span>
+      </div>
+
+    </div>
+
+    <!-- Interactive Resize Handle -->
+    <div class="hud-resize-handle" id="resizeHandle" title="Drag to Resize"></div>
+
+    <!-- In-Widget Settings Modal -->
+    <div class="hud-settings-modal" id="settingsModal">
+      <div class="settings-title">
+        <span>HUD TELEMETRY CONFIGURATION</span>
+        <span style="cursor: pointer; color: #8A94A0;" id="btnCloseSettings">X</span>
+      </div>
+
+      <div class="settings-grid">
+        <label class="setting-item">
+          <input type="checkbox" id="cfgShowGpu" checked>
+          <span>GPU Telemetry</span>
+        </label>
+        <label class="setting-item">
+          <input type="checkbox" id="cfgShowMem" checked>
+          <span>VRAM / Memory</span>
+        </label>
+        <label class="setting-item">
+          <input type="checkbox" id="cfgShowCpu" checked>
+          <span>CPU Telemetry</span>
+        </label>
+        <label class="setting-item">
+          <input type="checkbox" id="cfgShowRam" checked>
+          <span>RAM Telemetry</span>
+        </label>
+        <label class="setting-item">
+          <input type="checkbox" id="cfgShowStorage" checked>
+          <span>Storage Drives</span>
+        </label>
+        <label class="setting-item">
+          <input type="checkbox" id="cfgShowFps" checked>
+          <span>Display / Refresh</span>
+        </label>
+      </div>
+
+      <div class="slider-row">
+        <div class="slider-header">
+          <span>HUD UI SCALE</span>
+          <span id="lblScale">100%</span>
+        </div>
+        <input type="range" id="rngScale" min="75" max="140" value="100" step="5">
+      </div>
+
+      <div class="slider-row">
+        <div class="slider-header">
+          <span>BACKGROUND OPACITY</span>
+          <span id="lblOpacity">84%</span>
+        </div>
+        <input type="range" id="rngOpacity" min="30" max="100" value="84" step="2">
+      </div>
+
+      <div class="settings-footer">
+        <button class="btn-save" id="btnSaveSettings">DONE</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+      const isTauri = typeof window !== 'undefined' && Boolean(window.__TAURI__?.core?.invoke);
+
+      async function invokeTauri(cmd, args) {
+        if (!isTauri) return null;
+        try {
+          return await window.__TAURI__.core.invoke(cmd, args);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      // Dragging support
+      const container = document.getElementById('hudContainer');
+      container.addEventListener('mousedown', async (e) => {
+        // Prevent drag when clicking settings modal, buttons, or resize handle
+        if (e.target.closest('#hudControls') || e.target.closest('#settingsModal') || e.target.closest('#resizeHandle')) {
+          return;
+        }
+        if (e.button === 0 && window.__TAURI__?.window) {
+          try {
+            await window.__TAURI__.window.getCurrentWindow().startDragging();
+          } catch (err) { }
+        }
+      });
+
+      // Right-click opens Settings instead of closing unexpectedly
+      window.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        openSettings();
+      });
+
+      // Double-click to toggle HUD visibility
+      window.addEventListener('dblclick', async (e) => {
+        if (e.target.closest('#settingsModal') || e.target.closest('#hudControls')) return;
+        if (isTauri) {
+          await invokeTauri('toggle_hud_window');
+        }
+      });
+
+      // Close button
+      document.getElementById('btnHide').addEventListener('click', async () => {
+        if (isTauri) {
+          await invokeTauri('toggle_hud_window');
+        }
+      });
+
+      // ================= Settings Logic =================
+      const modal = document.getElementById('settingsModal');
+      const btnSettings = document.getElementById('btnSettings');
+      const btnCloseSettings = document.getElementById('btnCloseSettings');
+      const btnSaveSettings = document.getElementById('btnSaveSettings');
+
+      const cfgShowGpu = document.getElementById('cfgShowGpu');
+      const cfgShowMem = document.getElementById('cfgShowMem');
+      const cfgShowCpu = document.getElementById('cfgShowCpu');
+      const cfgShowRam = document.getElementById('cfgShowRam');
+      const cfgShowStorage = document.getElementById('cfgShowStorage');
+      const cfgShowFps = document.getElementById('cfgShowFps');
+
+      const rngScale = document.getElementById('rngScale');
+      const rngOpacity = document.getElementById('rngOpacity');
+      const lblScale = document.getElementById('lblScale');
+      const lblOpacity = document.getElementById('lblOpacity');
+
+      const DEFAULT_PREFS = {
+        showGpu: true,
+        showMem: true,
+        showCpu: true,
+        showRam: true,
+        showStorage: true,
+        showFps: true,
+        scale: 100,
+        opacity: 84
+      };
+
+      let prefs = { ...DEFAULT_PREFS };
+      try {
+        const saved = localStorage.getItem('nitroman_hud_prefs');
+        if (saved) prefs = Object.assign(prefs, JSON.parse(saved));
+      } catch (err) {}
+
+      function applyPrefs() {
+        document.getElementById('rowGpu').style.display = prefs.showGpu ? 'grid' : 'none';
+        document.getElementById('rowMem').style.display = prefs.showMem ? 'grid' : 'none';
+        document.getElementById('rowCpu').style.display = prefs.showCpu ? 'grid' : 'none';
+        document.getElementById('rowRam').style.display = prefs.showRam ? 'grid' : 'none';
+        document.getElementById('storageRows').style.display = prefs.showStorage ? 'flex' : 'none';
+        document.getElementById('dividerStorage').style.display = prefs.showStorage ? 'block' : 'none';
+        document.getElementById('rowFps').style.display = prefs.showFps ? 'grid' : 'none';
+        document.getElementById('dividerFps').style.display = prefs.showFps ? 'block' : 'none';
+
+        const scaleVal = prefs.scale / 100;
+        document.documentElement.style.setProperty('--hud-scale', scaleVal);
+        document.documentElement.style.setProperty('--rtss-bg', `rgba(4, 6, 8, ${prefs.opacity / 100})`);
+
+        cfgShowGpu.checked = prefs.showGpu;
+        cfgShowMem.checked = prefs.showMem;
+        cfgShowCpu.checked = prefs.showCpu;
+        cfgShowRam.checked = prefs.showRam;
+        cfgShowStorage.checked = prefs.showStorage;
+        cfgShowFps.checked = prefs.showFps;
+
+        rngScale.value = prefs.scale;
+        lblScale.textContent = prefs.scale + '%';
+        rngOpacity.value = prefs.opacity;
+        lblOpacity.textContent = prefs.opacity + '%';
+      }
+
+      function savePrefs() {
+        prefs.showGpu = cfgShowGpu.checked;
+        prefs.showMem = cfgShowMem.checked;
+        prefs.showCpu = cfgShowCpu.checked;
+        prefs.showRam = cfgShowRam.checked;
+        prefs.showStorage = cfgShowStorage.checked;
+        prefs.showFps = cfgShowFps.checked;
+        prefs.scale = +rngScale.value;
+        prefs.opacity = +rngOpacity.value;
+
+        try {
+          localStorage.setItem('nitroman_hud_prefs', JSON.stringify(prefs));
+        } catch (err) {}
+        applyPrefs();
+      }
+
+      function openSettings() {
+        applyPrefs();
+        modal.classList.add('active');
+      }
+
+      function closeSettings() {
+        modal.classList.remove('active');
+      }
+
+      btnSettings.addEventListener('click', openSettings);
+      btnCloseSettings.addEventListener('click', closeSettings);
+      btnSaveSettings.addEventListener('click', () => {
+        savePrefs();
+        closeSettings();
+      });
+
+      rngScale.addEventListener('input', () => {
+        lblScale.textContent = rngScale.value + '%';
+        document.documentElement.style.setProperty('--hud-scale', rngScale.value / 100);
+      });
+
+      rngOpacity.addEventListener('input', () => {
+        lblOpacity.textContent = rngOpacity.value + '%';
+        document.documentElement.style.setProperty('--rtss-bg', `rgba(4, 6, 8, ${rngOpacity.value / 100})`);
+      });
+
+      applyPrefs();
+
+      // ================= Interactive Drag Resize Handle =================
+      const resizeHandle = document.getElementById('resizeHandle');
+      let isResizing = false;
+      let startX = 0, startY = 0, startW = 0, startH = 0;
+
+      resizeHandle.addEventListener('mousedown', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        isResizing = true;
+        startX = e.screenX;
+        startY = e.screenY;
+
+        if (window.__TAURI__?.window) {
+          try {
+            const size = await window.__TAURI__.window.getCurrentWindow().innerSize();
+            startW = size.width;
+            startH = size.height;
+          } catch (err) {
+            startW = window.innerWidth;
+            startH = window.innerHeight;
+          }
+        } else {
+          startW = window.innerWidth;
+          startH = window.innerHeight;
+        }
+
+        window.addEventListener('mousemove', onResizeMove);
+        window.addEventListener('mouseup', onResizeEnd);
+      });
+
+      async function onResizeMove(e) {
+        if (!isResizing) return;
+        const dx = e.screenX - startX;
+        const dy = e.screenY - startY;
+        const newW = Math.max(320, Math.round(startW + dx));
+        const newH = Math.max(140, Math.round(startH + dy));
+
+        if (window.__TAURI__?.window?.LogicalSize) {
+          try {
+            await window.__TAURI__.window.getCurrentWindow().setSize(
+              new window.__TAURI__.window.LogicalSize(newW, newH)
+            );
+          } catch (err) {}
+        }
+      }
+
+      function onResizeEnd() {
+        isResizing = false;
+        window.removeEventListener('mousemove', onResizeMove);
+        window.removeEventListener('mouseup', onResizeEnd);
+      }
+
+      // ================= Telemetry Engine =================
+      let cachedSpecs = null;
+
+      async function updateHud() {
+        try {
+          const telem = await invokeTauri('get_telemetry');
+          if (telem) {
+            // CPU Telemetry
+            if (telem.cpu_temp_c != null && telem.cpu_temp_c > 0) {
+              document.getElementById('cpuTemp').textContent = Math.round(telem.cpu_temp_c);
+            }
+            if (telem.cpu_load_pct != null) {
+              document.getElementById('cpuLoad').textContent = Math.round(telem.cpu_load_pct);
+            }
+            if (telem.cpu_clock_mhz != null) {
+              document.getElementById('cpuClock').textContent = Math.round(telem.cpu_clock_mhz);
+            } else if (telem.cpu_clock_ghz != null) {
+              document.getElementById('cpuClock').textContent = Math.round(telem.cpu_clock_ghz * 1000);
+            }
+            if (telem.cpu_power_w != null) {
+              document.getElementById('cpuPwr').textContent = telem.cpu_power_w.toFixed(1);
+            }
+
+            // GPU Telemetry
+            if (telem.gpu_temp_c != null && telem.gpu_temp_c > 0) {
+              document.getElementById('gpuTemp').textContent = Math.round(telem.gpu_temp_c);
+            }
+            if (telem.gpu_load_pct != null) {
+              document.getElementById('gpuLoad').textContent = Math.round(telem.gpu_load_pct);
+            }
+            if (telem.gpu_clock_mhz != null) {
+              document.getElementById('gpuClock').textContent = Math.round(telem.gpu_clock_mhz);
+            } else if (telem.gpu_clock_ghz != null) {
+              document.getElementById('gpuClock').textContent = Math.round(telem.gpu_clock_ghz * 1000);
+            }
+            if (telem.gpu_fan_rpm != null) {
+              const fanPct = Math.min(100, Math.round((telem.gpu_fan_rpm / 5800) * 100));
+              document.getElementById('gpuFan').textContent = fanPct;
+            }
+
+            // VRAM Telemetry
+            if (telem.vram_used_mb != null) {
+              document.getElementById('vramUsed').textContent = telem.vram_used_mb;
+            }
+            if (telem.vram_clock_mhz != null) {
+              document.getElementById('vramClock').textContent = telem.vram_clock_mhz;
+            }
+
+            // RAM Telemetry (real-time 1s update)
+            if (telem.ram_used_mb != null) {
+              document.getElementById('ramUsed').textContent = telem.ram_used_mb;
+            }
+            if (telem.ram_load_pct != null) {
+              document.getElementById('ramLoad').textContent = telem.ram_load_pct;
+            }
+
+            // Storage Temperatures (real-time 1s update)
+            if (telem.storage_temps && telem.storage_temps.length > 0) {
+              telem.storage_temps.forEach((t, idx) => {
+                const el = document.getElementById('storageTemp_' + idx);
+                if (el && t > 0) {
+                  el.textContent = t;
+                }
+              });
+            }
+          }
+        } catch (err) {}
+      }
+
+      function renderSpecs(specs) {
+        if (!specs) return;
+
+        // Dynamic RAM total & channel detection
+        if (specs.ram) {
+          document.getElementById('ramTotalTxt').textContent =
+            Math.round(specs.ram.total_gb) + ' GB ' + (specs.ram.channels || 'Dual-Channel');
+        }
+
+        // Dynamic GPU Model display
+        if (specs.gpus && specs.gpus.length > 0) {
+          const dGpu = specs.gpus.find(g => g.is_discrete) || specs.gpus[0];
+          const vramStr = dGpu.vram_gb > 0 ? ` (${dGpu.vram_gb} GB)` : '';
+          const modelEl = document.getElementById('gpuModel');
+          if (modelEl) modelEl.textContent = dGpu.name + vramStr;
+        }
+
+        // Dynamic Display detection (handles unplugged monitor)
+        if (specs.displays && specs.displays.length > 0) {
+          const prim = specs.displays.find(d => d.is_primary) || specs.displays[0];
+          document.getElementById('fpsVal').textContent = '--';
+          document.getElementById('displayTxt').textContent = prim.name + ' (' + prim.refresh_rate_hz + ' Hz) [Desktop]';
+        }
+
+        // Dynamic Multi-Storage Rows
+        const storeContainer = document.getElementById('storageRows');
+        if (specs.storages && specs.storages.length > 0) {
+          let html = '';
+          specs.storages.forEach((st, idx) => {
+            const isHdd = st.media_type.toLowerCase().includes('hard disk') || st.model.toLowerCase().includes('hgst');
+            const tagClass = isHdd ? 'tag-hdd' : 'tag-ssd';
+            const tagLabel = isHdd ? 'HDD' : ('SSD ' + (idx + 1));
+            const temp = st.temp_c || (isHdd ? 34 : (idx === 0 ? 42 : 38));
+
+            let partTxt = '';
+            if (specs.partitions) {
+              if (idx === 0) partTxt = '[C: / D:]';
+              else if (idx === 1) partTxt = '[F:]';
+              else if (idx === 2) partTxt = '[E:]';
+            }
+
+            html += `
+              <div class="rtss-row">
+                <span class="rtss-tag ${tagClass}">${tagLabel}</span>
+                <span class="metric-group"><b class="num-amber" id="storageTemp_${idx}">${temp}</b><span class="unit">&deg;C</span></span>
+                <span class="sub-note span-4">${st.model} ${partTxt}</span>
+              </div>
+            `;
+          });
+          storeContainer.innerHTML = html;
+        }
+      }
+
+      async function refreshSpecs() {
+        try {
+          const specs = await invokeTauri('get_system_specs');
+          if (specs) {
+            cachedSpecs = specs;
+            renderSpecs(specs);
+          }
+        } catch (err) {}
+      }
+
+      setInterval(updateHud, 1000);
+      updateHud();
+
+      setInterval(refreshSpecs, 15000);
+      refreshSpecs();
+    })();
+  </script>
+</body>
+
+</html>

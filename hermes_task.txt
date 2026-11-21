@@ -1,0 +1,26 @@
+Halo Hermes! Tolong bantu selesaikan tugas-tugas pendukung (lightweight tasks) untuk project NitroMan berikut:
+
+ATURAN PALING PENTING:
+- DILARANG MENGGUNAKAN EMOJI SAMA SEKALI (zero emoji) di seluruh file, teks, script, maupun markdown!
+- Semua file berada di direktori D:\Project\HermesAI\nitroman\
+
+TUGAS KAMU:
+1. Buat file dokumentasi teknis dan user guide lengkap di `docs/README.md`.
+Dokumentasikan:
+- Deskripsi NitroMan: Unified utility pengganti Acer Care Center & NitroSense khusus Acer Nitro AN515-57 (Windows 11, BIOS 1.17).
+- Fitur utama: Telemetri suhu/RPM, Pengaturan profil termal (Quiet, Balanced, Performance), Fan control (Auto, Custom, CoolBoost), 4-Zone RGB keyboard backlight control, Battery Care 80% limit (Conservation mode), System tune up / disk clean, System tray minimization, Windows Task Scheduler autostart.
+- Perbandingan performa:
+  * Idle RAM: NitroMan 40-60 MB vs Acer Care Center + NitroSense 300-600 MB (penghematan hingga 90%).
+  * Startup Time: NitroMan < 0.5s vs Acer 5-8s.
+  * Dependency: Pure Rust + Tauri native WMI, tanpa background service bloatware (PSSvc, ACCSvc).
+- Panduan penggunaan CLI (`nitroman-cli.exe`): status, profile, fan, battery, rgb, rgb-effect, clean, config.
+- Panduan instalasi autostart via Task Scheduler (`scripts/register_task.ps1` dan `scripts/unregister_task.ps1`).
+
+2. Buat script benchmark di `scripts/benchmark.ps1`:
+- Script PowerShell yang menguji kecepatan respon `nitroman-cli.exe status`, memverifikasi unit test `cargo test --workspace`, memeriksa penggunaan memori proses `nitroman-gui.exe` atau `nitroman-cli.exe` jika berjalan, dan menampilkan tabel perbandingan ASCII yang rapi (tanpa emoji).
+
+3. Perbarui `CHECKLIST.md`:
+- Tandai item checklist terkait dokumentasi dan script benchmark.
+- Tambahkan entri di tabel Activity Log atas nama Hermes dengan timestamp saat ini dan ringkasan pekerjaan kamu.
+
+Tolong eksekusi dan tulis file-file tersebut sekarang juga. Terima kasih!

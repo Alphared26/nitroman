@@ -1,0 +1,21 @@
+# Rust and Cargo build targets
+/target/
+Cargo.lock
+
+# Test and temporary directories
+/scratch/
+/backup_*/
+*.log
+*.tmp
+*.bak
+
+# Environment and IDE settings
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+
+# Output binaries (distributed via GitHub Releases)
+dist/*.exe
+dist/*.zip
+installer/bundled/app/*.exe

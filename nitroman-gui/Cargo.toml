@@ -1,0 +1,14 @@
+[package]
+name = "nitroman-gui"
+version.workspace = true
+edition.workspace = true
+build = "build.rs"
+
+[dependencies]
+nitroman-core = { path = "../nitroman-core" }
+serde.workspace = true
+serde_json.workspace = true
+tauri = { version = "2.12", features = ["tray-icon", "devtools"] }
+
+[build-dependencies]
+tauri-build = { version = "2.7", features = [] }

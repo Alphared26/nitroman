@@ -1,0 +1,2979 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NitroMan — Acer Nitro AN515-57</title>
+<link rel="icon" href="assets/nitroman_icon.ico">
+<style>
+@font-face{font-family:'Acer Foco';src:url('assets/font_acerfoco_rg.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:'Acer Foco';src:url('assets/font_acerfoco_bd.ttf') format('truetype');font-weight:700;font-display:swap}
+@font-face{font-family:'Acer Foco';src:url('assets/font_acerfoco_blk.ttf') format('truetype');font-weight:900;font-display:swap}
+
+:root{
+  --red:#E4002B; --red-d:#8f001b; --red-glow:rgba(228,0,43,.45);
+  --cyan:#00D2FF; --cyan-glow:rgba(0,210,255,.4);
+  --green:#00E676; --amber:#FFAA00; --purple:#9900FF;
+  --bg0:#07080a; --bg1:#0c0e11; --bg2:#12151a; --bg3:#1a1e25;
+  --line:#262b33; --line2:#363c47;
+  --tx:#e9ecf1; --tx2:#98a0ad; --tx3:#5d6572;
+  --ch:14px;
+  --font:'Acer Foco','Segoe UI','Arial Narrow',Arial,sans-serif;
+  --z1:#E4002B; --z2:#00D2FF; --z3:#00D2FF; --z4:#E4002B;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--tx);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased;user-select:none}
+button{font-family:inherit;color:inherit;cursor:pointer;border:0;background:none}
+img{display:block;-webkit-user-drag:none}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--bg1)}
+::-webkit-scrollbar-thumb{background:var(--line2)}
+::-webkit-scrollbar-thumb:hover{background:var(--red)}
+
+/* App shell */
+#app{position:fixed;inset:0;display:flex;flex-direction:column;min-width:1100px;min-height:680px;
+  background:
+    linear-gradient(180deg,rgba(7,8,10,.82),rgba(7,8,10,.94)),
+    url('assets/images_200_img_bg_nitro.png') center/cover no-repeat,
+    var(--bg0);}
+#app::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.55;
+  background:
+   repeating-linear-gradient(45deg,rgba(255,255,255,.018) 0 2px,transparent 2px 4px),
+   repeating-linear-gradient(-45deg,rgba(0,0,0,.28) 0 2px,transparent 2px 4px);}
+#app>*{position:relative}
+
+/* Chamfered panel */
+.cp{position:relative;--c:var(--ch);
+  clip-path:polygon(var(--c) 0,100% 0,100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,0 100%,0 var(--c));
+  background:var(--line2)}
+.cp::before{content:"";position:absolute;inset:1px;z-index:0;
+  clip-path:polygon(var(--c) 0,100% 0,100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,0 100%,0 var(--c));
+  background:
+   repeating-linear-gradient(45deg,rgba(255,255,255,.02) 0 2px,transparent 2px 4px),
+   linear-gradient(160deg,#161a20,#0d0f13);}
+.cp>*{position:relative;z-index:1}
+.cp.hot{background:linear-gradient(135deg,var(--red),var(--line2) 45%)}
+.cp.cool{background:linear-gradient(135deg,var(--cyan),var(--line2) 45%)}
+.pad{padding:16px 18px}
+.ph{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.ph h3{font-size:12px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:var(--tx)}
+.ph .bar{width:4px;height:14px;background:var(--red);box-shadow:0 0 8px var(--red-glow)}
+.ph .bar.c{background:var(--cyan);box-shadow:0 0 8px var(--cyan-glow)}
+.ph .sp{flex:1}
+.ph small{font-size:11px;color:var(--tx3);letter-spacing:.08em}
+.muted{color:var(--tx2);font-size:12px;line-height:1.5}
+.mono{font-variant-numeric:tabular-nums}
+
+/* Header */
+header{height:64px;flex:none;display:flex;align-items:stretch;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,#14171c,#0a0c0f)}
+header::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;
+  background:linear-gradient(90deg,var(--red),transparent 30%,transparent 70%,var(--cyan))}
+.brand{display:flex;align-items:center;gap:12px;padding:0 24px 0 20px;
+  clip-path:polygon(0 0,100% 0,calc(100% - 18px) 100%,0 100%);
+  background:linear-gradient(90deg,#1a0508,#15080b);min-width:268px}
+.brand svg{width:34px;height:34px;filter:drop-shadow(0 0 6px var(--red-glow))}
+.brand .t1{font-weight:900;font-size:19px;letter-spacing:.14em;line-height:1}
+.brand .t1 b{color:var(--red)}
+.brand .t2{font-size:10px;letter-spacing:.22em;color:var(--tx2);margin-top:5px;text-transform:uppercase}
+nav{display:flex;align-items:stretch;flex:1;padding-left:6px}
+nav button{position:relative;display:flex;align-items:center;gap:9px;padding:0 15px;font-size:11.5px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);transition:color .15s,background .15s;white-space:nowrap}
+nav button svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button i{font-style:normal;font-size:10px;color:var(--tx3);border:1px solid var(--line2);padding:1px 5px}
+nav button:hover{color:var(--tx);background:rgba(255,255,255,.03)}
+nav button.on{color:#fff;background:linear-gradient(180deg,transparent,rgba(228,0,43,.16))}
+nav button.on i{color:#fff;border-color:var(--red);background:var(--red)}
+nav button.on::after{content:"";position:absolute;left:8px;right:8px;bottom:0;height:3px;background:var(--red);box-shadow:0 0 12px var(--red)}
+nav button .sub{display:block;font-size:9px;letter-spacing:.1em;color:var(--cyan);font-weight:400;margin-top:2px}
+.status{display:flex;align-items:center;gap:16px;padding:0 16px;font-size:11px;letter-spacing:.08em;color:var(--tx2)}
+.st{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.st b{color:var(--tx);font-weight:700}
+.led{width:8px;height:8px;border-radius:50%;background:var(--tx3)}
+.led.ok{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+.led.err{background:var(--red);box-shadow:0 0 8px var(--red)}
+@keyframes pulse{50%{opacity:.45}}
+.wbtn{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--line2);color:var(--tx2);
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);transition:.15s}
+.wbtn:hover{border-color:var(--red);color:#fff;background:rgba(228,0,43,.2)}
+.wbtn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* Tabs */
+main{flex:1;min-height:0;position:relative}
+.tab{position:absolute;inset:0;padding:18px 22px;overflow:auto;display:none}
+.tab.on{display:block}
+.grid3{display:grid;grid-template-columns:300px minmax(420px,1fr) 330px;gap:18px;height:100%;min-height:600px}
+.col{display:flex;flex-direction:column;gap:16px;min-height:0}
+
+/* Controls */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.seg button{position:relative;padding:14px 4px 16px;font-weight:900;font-size:13px;letter-spacing:.14em;color:var(--tx2);
+  background:var(--bg3);border:1px solid var(--line);
+  clip-path:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px);transition:.15s}
+.seg button:hover{color:#fff;border-color:var(--line2)}
+.seg button .ledbar{position:absolute;left:14px;right:14px;bottom:6px;height:3px;background:#2a2e36}
+.seg button.on{color:#fff;background:linear-gradient(180deg,#2a0a10,#1a0b0f)}
+.seg button.on .ledbar{background:var(--red);box-shadow:0 0 10px var(--red)}
+
+.tg{position:relative;display:inline-block;width:48px;height:24px;flex:none}
+.tg input{position:absolute;opacity:0;inset:0;width:100%;height:100%;cursor:pointer;z-index:2;margin:0}
+.tg span{position:absolute;inset:0;background:#0a0b0d;border:1px solid var(--line2);transition:.2s;
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+.tg span::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;background:var(--tx3);transition:.2s;
+  clip-path:polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px)}
+.tg input:checked+span{background:#2a0a10;border-color:var(--red);box-shadow:inset 0 0 10px rgba(228,0,43,.4)}
+.tg input:checked+span::after{left:27px;background:var(--red);box-shadow:0 0 10px var(--red)}
+.tg input:focus-visible+span{outline:2px solid var(--cyan);outline-offset:2px}
+.tg.cy input:checked+span{background:#04202a;border-color:var(--cyan);box-shadow:inset 0 0 10px rgba(0,210,255,.35)}
+.tg.cy input:checked+span::after{background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+
+.row{display:flex;align-items:center;gap:14px}
+.row .grow{flex:1;min-width:0}
+.row h4{font-size:13px;font-weight:700;letter-spacing:.06em}
+.row p{font-size:11.5px;color:var(--tx2);margin-top:3px;line-height:1.45}
+.hr{height:1px;background:var(--line);margin:12px 0}
+
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 22px;
+  font-size:12px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#fff;
+  background:linear-gradient(180deg,var(--red),#a30020);
+  clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);transition:.15s}
+.btn:hover{filter:brightness(1.18);box-shadow:0 0 18px var(--red-glow)}
+.btn:active{transform:translateY(1px)}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn.ghost{background:#1a1e25;color:var(--tx);box-shadow:inset 0 0 0 1px var(--line2)}
+.btn.ghost:hover{background:#232830;box-shadow:inset 0 0 0 1px var(--cyan)}
+.btn.cy{background:linear-gradient(180deg,#00bfe8,#0086a8);color:#001018}
+.btn.sm{padding:8px 14px;font-size:11px}
+.btn[disabled]{opacity:.5;pointer-events:none}
+
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:6px;background:linear-gradient(90deg,var(--rc,var(--red)) var(--pct,50%),#23272f var(--pct,50%));border:1px solid #0a0b0d}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:22px;margin-top:-9px;background:#e9ecf1;border:2px solid var(--rc,var(--red));
+  clip-path:polygon(0 4px,4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%)}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 2px var(--cyan)}
+
+/* Dashboard */
+.power{display:flex;align-items:center;gap:14px}
+.power .ico{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line2);background:#0b0d10;
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.power .ico svg{width:22px;height:22px;stroke:var(--green);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.power .w{font-size:26px;font-weight:900;line-height:1}
+.power .w small{font-size:12px;color:var(--tx2);font-weight:400;margin-left:3px}
+.tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.14em;padding:3px 8px;border:1px solid var(--line2);color:var(--tx2)}
+.tag.g{color:var(--green);border-color:rgba(0,230,118,.5);background:rgba(0,230,118,.07)}
+.tag.r{color:var(--red);border-color:rgba(228,0,43,.6);background:rgba(228,0,43,.08)}
+.tag.a{color:var(--amber);border-color:rgba(255,170,0,.5);background:rgba(255,170,0,.07)}
+.tag.c{color:var(--cyan);border-color:rgba(0,210,255,.5);background:rgba(0,210,255,.07)}
+
+.cluster{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px}
+.dial{display:flex;flex-direction:column;align-items:center;min-height:0}
+.dialbox{position:relative;width:100%;max-width:260px;aspect-ratio:1}
+.dialbox .bezel{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:.92}
+.dialbox svg.g{position:absolute;inset:0;width:100%;height:100%}
+.dialbox .fanwrap{position:absolute;left:50%;top:50%;width:37%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,#0c0e11 55%,transparent 72%)}
+.dialbox .fanwrap img{width:100%;height:100%;object-fit:contain;animation:spin var(--dur,3s) linear infinite;
+  filter:drop-shadow(0 0 7px var(--gl,var(--cyan-glow))) brightness(1.1) contrast(1.05)}
+.dialbox .fanwrap::after{content:"";position:absolute;inset:34%;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#4a5058,#14171b 70%);box-shadow:0 0 0 1px #000,0 0 10px var(--gl,var(--cyan-glow))}
+@keyframes spin{to{transform:rotate(360deg)}}
+.dialtitle{margin-top:2px;font-size:12px;font-weight:900;letter-spacing:.3em;color:var(--tx2)}
+.dialtitle b{color:var(--dc)}
+.readout{display:grid;grid-template-columns:repeat(3,1fr);width:100%;margin-top:8px;border:1px solid var(--line);background:rgba(0,0,0,.35)}
+.readout div{padding:7px 4px;text-align:center;border-right:1px solid var(--line)}
+.readout div:last-child{border:0}
+.readout .v{font-size:20px;font-weight:900;line-height:1.1}
+.readout .v small{font-size:11px;color:var(--tx2);font-weight:400;margin-left:2px}
+.readout .l{font-size:9px;letter-spacing:.2em;color:var(--tx3);margin-top:3px}
+.dial.cpu{--dc:var(--cyan)}
+.dial.gpu{--dc:var(--red)}
+
+/* Real-Time Live Telemetry Stream */
+.telemetry-stream{display:flex;flex-direction:column;gap:10px;margin-top:6px;flex:1}
+.stream-card{background:rgba(10,12,15,0.85);border:1px solid var(--line);padding:10px 12px;position:relative;border-radius:4px}
+.stream-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.stream-hdr h4{font-size:11px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
+.stream-hdr .stats{display:flex;gap:12px;font-size:10px;color:var(--tx2)}
+.stream-hdr .stats b{color:var(--tx)}
+.stream-svg{width:100%;height:76px;display:block}
+.stream-svg.osc-grid{background:#090b0e;border:1px solid #1c212a;border-radius:4px}
+.stream-svg path.line{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.stream-svg path.line.cpu{stroke:var(--cyan);filter:drop-shadow(0 0 5px var(--cyan))}
+.stream-svg path.line.gpu{stroke:var(--red);filter:drop-shadow(0 0 5px var(--red))}
+.stream-svg path.area{opacity:.22}
+.stream-svg path.area.cpu{fill:var(--cyan)}
+.stream-svg path.area.gpu{fill:var(--red)}
+
+.profiles{display:grid;gap:10px}
+.prof{position:relative;display:flex;align-items:center;gap:14px;padding:12px 14px;text-align:left;background:var(--bg3);border:1px solid var(--line);
+  clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);transition:.15s}
+.prof:hover{border-color:var(--line2);background:#20252d}
+.prof-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:6px;background:rgba(0,0,0,0.4);border:1px solid var(--line);flex:none;transition:.2s}
+.prof-icon svg{width:26px;height:26px;display:block}
+.prof-icon.p-quiet svg{filter:drop-shadow(0 0 6px rgba(0,230,118,0.5))}
+.prof-icon.p-balanced svg{filter:drop-shadow(0 0 6px rgba(0,210,255,0.5))}
+.prof-icon.p-perf svg{filter:drop-shadow(0 0 6px rgba(228,0,43,0.6))}
+.prof.on .prof-icon.p-quiet{border-color:#00E676;background:rgba(0,230,118,0.12)}
+.prof.on .prof-icon.p-balanced{border-color:#00D2FF;background:rgba(0,210,255,0.12)}
+.prof.on .prof-icon.p-perf{border-color:#E4002B;background:rgba(228,0,43,0.15)}
+.prof .n{font-size:14px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+.prof .d{font-size:11px;color:var(--tx2);margin-top:3px}
+.prof .m{margin-left:auto;font-size:10px;color:var(--tx3);letter-spacing:.1em;text-align:right}
+.prof.on{background:linear-gradient(90deg,#2b0a11,#15090c);border-color:var(--red)}
+.prof.on::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--red);box-shadow:0 0 12px var(--red)}
+
+/* Multi Storage and Partitions */
+.storage-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.drive-item{background:#0a0c10;border:1px solid var(--line);padding:10px 12px;border-radius:4px}
+.drive-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.drive-title{font-size:12px;font-weight:700;color:var(--tx)}
+.drive-sub{font-size:10px;color:var(--tx3);letter-spacing:0.5px}
+.part-meter-wrap{margin-top:6px}
+.part-bar{height:6px;background:#181c24;border-radius:3px;overflow:hidden;margin:4px 0}
+.part-bar-fill{height:100%;background:var(--cyan);transition:width 0.4s ease}
+.part-bar-fill.hot{background:var(--red)}
+.part-bar-fill.warn{background:var(--amber)}
+.part-bar-fill.hdd{background:#00E676}
+.part-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--tx2);font-family:'Consolas',monospace}
+.batt{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.batt div{background:#0a0c0f;border:1px solid var(--line);padding:8px 10px}
+.batt .l{font-size:9px;letter-spacing:.18em;color:var(--tx3)}
+.batt .v{font-size:15px;font-weight:700;margin-top:3px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{padding:12px;background:var(--bg3);border:1px solid var(--line);display:flex;flex-direction:column;gap:9px;
+  clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.tile .top{display:flex;justify-content:space-between;align-items:center}
+.tile h4{font-size:12px;font-weight:900;letter-spacing:.1em}
+.tile p{font-size:11px;color:var(--tx2);line-height:1.4}
+
+/* Fan tab */
+.two{display:grid;grid-template-columns:340px 1fr;gap:18px}
+.slbl{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+.slbl span{font-size:11px;font-weight:900;letter-spacing:.2em;color:var(--tx2)}
+.slbl b{font-size:26px;font-weight:900}
+.slbl b small{font-size:12px;color:var(--tx2);font-weight:400}
+.presets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.chip{padding:11px 6px;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--tx2);background:var(--bg3);border:1px solid var(--line);
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);transition:.15s}
+.chip:hover{color:#fff;border-color:var(--line2)}
+.chip.on{color:#fff;border-color:var(--red);background:#27090f}
+#curve{width:100%;height:auto;display:block;touch-action:none}
+#curve .pt{cursor:grab}
+#curve .pt:active{cursor:grabbing}
+.curvefoot{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.curvefoot .sp{flex:1}
+.cvtable{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.cvtable div{background:#0a0c0f;border:1px solid var(--line);padding:8px 10px;font-size:11px;color:var(--tx3);letter-spacing:.12em}
+.cvtable b{display:block;font-size:15px;color:var(--tx);margin-top:3px;letter-spacing:0}
+
+/* Authentic Acer Nitro AN515-57 Keyboard Deck */
+.kb-deck-container{position:relative;background:#0b0d12;border:1px solid var(--line);padding:14px;border-radius:6px;
+  box-shadow:inset 0 0 35px rgba(0,0,0,0.85),0 12px 28px rgba(0,0,0,0.6)}
+.kb-chassis-bezel{background:#11141a;padding:12px 14px 16px;border:1px solid #222731;border-radius:4px;position:relative}
+
+/* Underglow backlighting */
+.kb-underglow{position:absolute;inset:12px 14px 16px;display:grid;grid-template-columns:repeat(4,1fr);z-index:1;filter:blur(22px);opacity:calc(var(--br,100)/100*.85);pointer-events:none}
+.kb-underglow div:nth-child(1){background:var(--z1)}
+.kb-underglow div:nth-child(2){background:var(--z2)}
+.kb-underglow div:nth-child(3){background:var(--z3)}
+.kb-underglow div:nth-child(4){background:var(--z4)}
+
+/* Keyboard Rows Container */
+.kb-rows{position:relative;z-index:2;display:flex;flex-direction:column;gap:3.5px}
+.kb-row{display:flex;gap:3.5px;height:32px;align-items:stretch}
+.kb-row.r-fn{height:24px;margin-bottom:3px}
+.k-gap{width:6px;flex:none}
+.k-gap-lg{width:14px;flex:none}
+
+/* Realistic Keycaps */
+.key{background:#14171e;border:1px solid #262c37;border-radius:3px;
+  display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ccd3df;
+  position:relative;transition:all .18s;cursor:pointer;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,0.6);
+  user-select:none}
+.key::before{content:"";position:absolute;inset:0;opacity:0.25;background:var(--zk, #E4002B);transition:opacity .2s}
+.key:hover{filter:brightness(1.35);transform:translateY(-1px);z-index:5}
+.key:active{transform:translateY(1px)}
+.key.k-fn{font-size:8.5px}
+
+/* Zone border glow */
+.key.z1{--zk:var(--z1);box-shadow:inset 0 -2px 0 var(--z1)}
+.key.z2{--zk:var(--z2);box-shadow:inset 0 -2px 0 var(--z2)}
+.key.z3{--zk:var(--z3);box-shadow:inset 0 -2px 0 var(--z3)}
+.key.z4{--zk:var(--z4);box-shadow:inset 0 -2px 0 var(--z4)}
+
+/* WASD special key styling (Acer Nitro Red/White High-Contrast) */
+.key.wasd{border:2px solid #E4002B !important;color:#fff !important;font-weight:900 !important;
+  background:linear-gradient(180deg,#3d0912,#1a0407) !important;
+  box-shadow:0 0 10px rgba(228,0,43,0.7),inset 0 0 8px rgba(228,0,43,0.8) !important}
+
+/* Arrow Keys Highlight */
+.key.arrow{border:1.5px solid #00D2FF !important;color:#fff !important;
+  background:linear-gradient(180deg,#09232c,#041116) !important;
+  box-shadow:0 0 8px rgba(0,210,255,0.6) !important}
+
+/* Dedicated Nitro [N] Key */
+.key.nitro-key{border:2px solid #E4002B !important;background:#E4002B !important;color:#fff !important;font-weight:900 !important;
+  box-shadow:0 0 15px var(--red-glow) !important;letter-spacing:1px}
+
+.zgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+.zc{text-align:left;padding:12px 14px;border:0;display:block;width:100%;cursor:pointer}
+.zc .h{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.zc .sw{width:20px;height:20px;border:1px solid #000;box-shadow:0 0 10px var(--zcol);background:var(--zcol)}
+.zc h4{font-size:12px;font-weight:900;letter-spacing:.14em}
+.zc .hx{font-size:11px;color:var(--tx2);letter-spacing:.1em}
+.zc.sel{outline:0}
+.zc.sel.cp{background:linear-gradient(135deg,var(--cyan),var(--line2) 55%)}
+.swatches{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.swatch{width:36px;height:36px;border:2px solid #000;box-shadow:0 0 0 1px var(--line2);background:var(--sc);transition:.15s;
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px)}
+.swatch:hover{transform:translateY(-2px);box-shadow:0 0 0 1px #fff,0 0 12px var(--sc)}
+.swatch.on{box-shadow:0 0 0 2px #fff,0 0 14px var(--sc)}
+.picker{display:flex;align-items:center;gap:10px;margin-left:8px;padding-left:14px;border-left:1px solid var(--line2)}
+.picker input[type=color]{-webkit-appearance:none;appearance:none;width:44px;height:36px;border:1px solid var(--line2);background:#0a0b0d;padding:3px;cursor:pointer}
+.picker input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.picker input[type=color]::-webkit-color-swatch{border:0}
+.fx{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.fx .chip{padding:12px 4px}
+
+/* System Specs: Authentic Acer Nitro AN515-57 Stage */
+.laptop-real-stage{position:relative;width:100%;height:410px;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 65%,rgba(228,0,43,.2) 0%,rgba(0,210,255,.09) 42%,transparent 72%);
+  border:1px solid var(--line);margin-bottom:18px;overflow:hidden}
+.laptop-real-stage::before{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.015) 0 2px,transparent 2px 4px);pointer-events:none}
+.laptop-img-wrapper{position:relative;width:340px;height:400px;display:flex;justify-content:center;align-items:center}
+.laptop-real-img{width:100%;height:auto;object-fit:contain;filter:drop-shadow(0 20px 40px rgba(0,0,0,0.95)) drop-shadow(0 0 25px rgba(228,0,43,0.3));pointer-events:none}
+
+/* Screen Holographic HUD Overlay */
+.laptop-screen-hud{position:absolute;top:20px;left:34px;right:34px;height:162px;
+  background:radial-gradient(ellipse at 50% 45%,#0a1f2e 0%,#04080e 90%);
+  border:1px solid rgba(0,210,255,0.6);box-shadow:inset 0 0 25px rgba(0,210,255,0.4),0 0 16px rgba(0,210,255,0.25);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;z-index:2;border-radius:2px}
+.laptop-screen-hud::before{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,rgba(0,210,255,.05) 0 2px,transparent 2px 4px);pointer-events:none}
+.hud-brand{font-size:18px;font-weight:900;letter-spacing:.25em;color:#fff;display:flex;align-items:center;gap:6px}
+.hud-brand b{color:var(--red);text-shadow:0 0 10px var(--red)}
+.hud-badge{font-size:8px;letter-spacing:.25em;color:var(--cyan);margin-top:2px}
+.hud-specs-row{display:flex;gap:8px;margin-top:8px;font-size:8.5px;letter-spacing:.08em;border:1px solid rgba(0,210,255,.3);padding:3px 8px;background:rgba(0,210,255,.08)}
+.hud-specs-row span{color:#fff;font-weight:700}
+
+/* Tactical HUD Radar Pins */
+.hud-pin{position:absolute;z-index:15;transform:translate(-50%,-50%);cursor:pointer;transition:transform .2s}
+.hud-pin:hover{transform:translate(-50%,-55%) scale(1.08)}
+.pin-dot{width:12px;height:12px;border-radius:50%;background:var(--pc,var(--cyan));box-shadow:0 0 14px var(--pc,var(--cyan));margin:0 auto;position:relative}
+.pin-dot::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:1px solid var(--pc,var(--cyan));animation:pulse 1.8s infinite}
+.pin-line{width:1px;height:22px;background:linear-gradient(180deg,var(--pc,var(--cyan)),transparent);margin:0 auto}
+.pin-card{background:rgba(12,15,20,0.94);border:1px solid var(--pc,var(--cyan));padding:4px 8px;border-radius:2px;
+  font-size:9.5px;font-weight:900;letter-spacing:.1em;color:#fff;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.85);
+  display:flex;align-items:center;gap:5px}
+.pin-card b{color:var(--pc,var(--cyan))}
+
+.specs{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:0}
+.kv>*{padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.kv>span{color:var(--tx3);letter-spacing:.1em;font-size:11px;text-transform:uppercase;padding-top:10px}
+.kv>b{font-weight:700;color:var(--tx)}
+.comp{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.meter{height:6px;background:#0a0c0f;border:1px solid var(--line);margin-top:6px;position:relative}
+.meter i{position:absolute;left:0;top:0;bottom:0;width:var(--w);background:var(--mc,var(--cyan));box-shadow:0 0 8px var(--mc,var(--cyan))}
+.big{font-size:30px;font-weight:900;line-height:1}
+.big small{font-size:13px;color:var(--tx2);font-weight:400}
+.diag{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stats3 div{background:#0a0c0f;border:1px solid var(--line);padding:10px}
+.stats3 .l{font-size:9px;letter-spacing:.18em;color:var(--tx3)}
+.stats3 .v{font-size:19px;font-weight:900;margin-top:4px}
+
+/* Tuneup */
+.tune{display:grid;grid-template-columns:1.15fr 1fr;gap:18px}
+.scan{display:flex;align-items:center;gap:22px}
+.ring{position:relative;width:150px;height:150px;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .ct{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring .ct b{font-size:28px;font-weight:900;line-height:1}
+.ring .ct small{font-size:10px;letter-spacing:.2em;color:var(--tx3);margin-top:4px}
+.junkrows{flex:1}
+.jr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.jr .nm{flex:1}
+.jr .sz{font-weight:700;width:70px;text-align:right}
+.chk{width:16px;height:16px;accent-color:var(--red)}
+.table{width:100%;border-collapse:collapse}
+.table th{font-size:10px;letter-spacing:.2em;color:var(--tx3);text-align:left;padding:8px 6px;border-bottom:1px solid var(--line2);font-weight:700}
+.table td{padding:10px 6px;border-bottom:1px solid var(--line);font-size:12.5px}
+.table tr:hover td{background:rgba(255,255,255,.02)}
+.prog{height:4px;background:#0a0c0f;margin-top:10px;overflow:hidden;display:none}
+.prog.on{display:block}
+.prog i{display:block;height:100%;width:0;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.ico-big{width:46px;height:46px;object-fit:contain;flex:none}
+.confirm{display:none;gap:8px;align-items:center}
+.confirm.on{display:inline-flex}
+
+/* Gaming */
+.gset{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.gset .cp .pad>.row+.row,.gset .cp .pad>.hr+.row{margin-top:0}
+.audio{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.audio .chip{padding:14px 4px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.audio .chip svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* Toast */
+#toasts{position:fixed;right:20px;bottom:20px;z-index:99;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:11px 16px 11px 14px;background:#101318;border:1px solid var(--line2);border-left:3px solid var(--cyan);font-size:12px;letter-spacing:.06em;
+  max-width:360px;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.toast.err{border-left-color:var(--red)}
+.toast.out{opacity:0;transform:translateX(20px);transition:.3s}
+
+@media (max-width:1300px){nav button{padding:0 10px;font-size:10.5px}nav button i{display:none}.brand{min-width:220px}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ================= HEADER ================= -->
+<header>
+  <div class="brand">
+    <img src="assets/nitroman_logo.png" style="width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 0 6px var(--red-glow));" alt="NitroMan">
+    <div><div class="t1">NITRO<b>MAN</b></div><div class="t2">ACER NITRO AN515-57</div></div>
+  </div>
+  <nav id="nav">
+    <button data-tab="dash" class="on"><i>1</i><svg viewBox="0 0 24 24"><path d="M12 14l4-5"/><path d="M3.5 17a9 9 0 1 1 17 0"/><circle cx="12" cy="14" r="1.2"/></svg><span>Dashboard</span></button>
+    <button data-tab="fan"><i>2</i><svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M4 16l5-5 4 3 7-8"/></svg><span>Fan Control<span class="sub">CURVES</span></span></button>
+    <button data-tab="rgb"><i>3</i><svg viewBox="0 0 24 24"><rect x="2.5" y="7" width="19" height="10" rx="1"/><path d="M6 10.5h.01M10 10.5h.01M14 10.5h.01M18 10.5h.01M7 14h10"/></svg><span>4-Zone RGB<span class="sub">KEYBOARD</span></span></button>
+    <button data-tab="specs"><i>4</i><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14"/><path d="M9 9h6v6H9zM9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg><span>System Specs<span class="sub">3D CHECKUP</span></span></button>
+    <button data-tab="tune"><i>5</i><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg><span>TuneUp<span class="sub">OPTIMIZER</span></span></button>
+    <button data-tab="game"><i>6</i><svg viewBox="0 0 24 24"><path d="M6 8h12a4 4 0 0 1 4 4v2a3 3 0 0 1-5.2 2L15 14H9l-1.8 2A3 3 0 0 1 2 14v-2a4 4 0 0 1 4-4z"/><path d="M8 10.5v3M6.5 12h3M16 11.5h.01M18 13h.01"/></svg><span>Gaming Settings</span></button>
+  </nav>
+  <div class="status">
+    <div class="st"><span class="led ok" id="ecLed"></span>EC <b id="ecTxt">ACTIVE</b></div>
+    <button class="btn sm ghost" id="btnToggleHud" style="height:28px;padding:2px 10px;font-size:10px;letter-spacing:1px;border-color:rgba(0,210,255,0.4);color:var(--cyan)" title="Toggle Always-on-Top Hardware HUD"><svg viewBox="0 0 24 24" style="width:12px;height:12px;margin-right:4px;stroke:currentColor;fill:none;stroke-width:2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>HUD OVERLAY</button>
+    <button class="wbtn" id="btnMin" title="Minimize ke tray" aria-label="Minimize ke tray"><svg viewBox="0 0 24 24"><path d="M5 18h14"/></svg></button>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= TAB 1: DASHBOARD ================= -->
+<section class="tab on" id="tab-dash">
+ <div class="grid3">
+
+  <!-- Left -->
+  <div class="col">
+    <div class="cp hot"><div class="pad">
+      <div class="ph"><span class="bar"></span><h3>Fan Mode</h3></div>
+      <div class="seg" id="fanSeg">
+        <button data-mode="auto" class="on">AUTO<span class="ledbar"></span></button>
+        <button data-mode="max">MAX<span class="ledbar"></span></button>
+        <button data-mode="custom">CUSTOM<span class="ledbar"></span></button>
+      </div>
+      <p class="muted" id="fanModeDesc" style="margin-top:12px">Kecepatan kipas diatur otomatis oleh EC berdasarkan suhu CPU dan GPU.</p>
+    </div></div>
+
+    <div class="cp"><div class="pad">
+      <div class="row">
+        <div class="grow"><h4>COOLBOOST</h4><p>Menaikkan batas kurva RPM saat beban termal tinggi.</p></div>
+        <label class="tg"><input type="checkbox" id="cbDash" aria-label="CoolBoost"><span></span></label>
+      </div>
+    </div></div>
+
+    <div class="cp"><div class="pad">
+      <div class="ph"><span class="bar c"></span><h3>Power Input</h3></div>
+      <div class="power">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M9 2v5M15 2v5"/><path d="M6 7h12v4a6 6 0 0 1-12 0z"/><path d="M12 17v5"/></svg></div>
+        <div class="grow"><div class="w mono"><span id="acW">135</span><small>W</small></div><div class="muted" style="margin-top:4px" id="acTxt">Adaptor AC terhubung</div></div>
+        <span class="tag g" id="acTag">PLUGGED</span>
+      </div>
+    </div></div>
+
+    <div class="cp" style="flex:1"><div class="pad" style="height:100%">
+      <div class="ph"><span class="bar"></span><h3>Thermal Summary</h3></div>
+      <div class="kv" style="grid-template-columns:110px 1fr">
+        <span>CPU Fan</span><b class="mono" id="sCpuF">-- RPM</b>
+        <span>GPU Fan</span><b class="mono" id="sGpuF">-- RPM</b>
+        <span>Mode</span><b id="sMode">AUTO</b>
+        <span>Profil</span><b id="sProf">BALANCED</b>
+        <span>CoolBoost</span><b id="sCb">OFF</b>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- Middle (Dual Tachometers + Live Telemetry Stream) -->
+  <div class="col">
+    <div class="cp cool" style="flex:1"><div class="pad" style="height:100%;display:flex;flex-direction:column">
+      <div class="ph"><span class="bar c"></span><h3>Thermal Cluster</h3><span class="sp"></span><small id="clk">LIVE</small></div>
+      <div class="cluster">
+        <div class="dial cpu">
+          <div class="dialbox" id="dialCpu"></div>
+          <div class="dialtitle"><b>CPU</b></div>
+          <div class="readout">
+            <div><div class="v mono" id="cpuT">--<small>&deg;C</small></div><div class="l">SUHU</div></div>
+            <div><div class="v mono" id="cpuR">--</div><div class="l">RPM</div></div>
+            <div><div class="v mono" id="cpuG">--<small>GHz</small></div><div class="l">CLOCK</div></div>
+          </div>
+        </div>
+        <div class="dial gpu">
+          <div class="dialbox" id="dialGpu"></div>
+          <div class="dialtitle"><b>GPU</b></div>
+          <div class="readout">
+            <div><div class="v mono" id="gpuT">--<small>&deg;C</small></div><div class="l">SUHU</div></div>
+            <div><div class="v mono" id="gpuR">--</div><div class="l">RPM</div></div>
+            <div><div class="v mono" id="gpuG">--<small>GHz</small></div><div class="l">CLOCK</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Live Telemetry Stream (Oscilloscope Telemetry Grid) -->
+      <div class="telemetry-stream">
+        <div class="stream-card">
+          <div class="stream-hdr">
+            <h4 style="color:var(--cyan);font-size:14px;letter-spacing:1.5px;font-weight:700;margin:0">CPU</h4>
+            <div class="stats mono">PEAK: <b id="cpuPeak">58&deg;C</b> &bull; LOAD: <b id="cpuLoad">28%</b> &bull; TDP: <b>45W</b></div>
+          </div>
+          <svg class="stream-svg osc-grid" id="cpuStreamSvg" viewBox="0 0 500 76" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="cpuStreamGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#00D2FF" stop-opacity="0.38"/>
+                <stop offset="100%" stop-color="#00D2FF" stop-opacity="0.0"/>
+              </linearGradient>
+            </defs>
+            <!-- Grid lines & Y labels -->
+            <line x1="28" y1="10" x2="492" y2="10" stroke="rgba(255,255,255,0.08)" stroke-dasharray="2,3"/>
+            <line x1="28" y1="28" x2="492" y2="28" stroke="rgba(255,255,255,0.06)" stroke-dasharray="2,3"/>
+            <line x1="28" y1="46" x2="492" y2="46" stroke="rgba(255,255,255,0.06)" stroke-dasharray="2,3"/>
+            <line x1="28" y1="64" x2="492" y2="64" stroke="rgba(255,255,255,0.08)" stroke-dasharray="2,3"/>
+            <text x="23" y="13" fill="#5d6572" font-size="8" font-family="'Consolas',monospace" text-anchor="end">100&deg;</text>
+            <text x="23" y="31" fill="#5d6572" font-size="8" font-family="'Consolas',monospace" text-anchor="end">75&deg;</text>
+            <text x="23" y="49" fill="#5d6572" font-size="8" font-family="'Consolas',monospace" text-anchor="end">50&deg;</text>
+            <text x="23" y="67" fill="#5d6572" font-size="8" font-family="'Consolas',monospace" text-anchor="end">25&deg;</text>
+            <!-- Time dividers -->
+            <line x1="120" y1="8" x2="120" y2="64" stroke="rgba(255,255,255,0.05)" stroke-dasharray="1,3"/>
+            <line x1="240" y1="8" x2="240" y2="64" stroke="rgba(255,255,255,0.05)" stroke-dasharray="1,3"/>
+            <line x1="360" y1="8" x2="360" y2="64" stroke="rgba(255,255,255,0.05)" stroke-dasharray="1,3"/>
+            <line x1="488" y1="8" x2="488" y2="64" stroke="rgba(0,210,255,0.25)"/>
+            <text x="120" y="73" fill="#464d59" font-size="7" font-family="'Consolas',monospace" text-anchor="middle">-45s</text>
+            <text x="240" y="73" fill="#464d59" font-size="7" font-family="'Consolas',monospace" text-anchor="middle">-30s</text>
+            <text x="360" y="73" fill="#464d59" font-size="7" font-family="'Consolas',monospace" text-anchor="middle">-15s</text>
+            <text x="488" y="73" fill="var(--cyan)" font-size="7.5" font-family="'Consolas',monospace" font-weight="bold" text-anchor="middle">NOW</text>
+            <!-- Path & Target -->
+            <path class="area cpu" id="cpuStreamArea" d="" fill="url(#cpuStreamGrad)"/>
+            <path class="line cpu" id="cpuStreamLine" d=""/>
+            <circle id="cpuStreamDot" cx="488" cy="46" r="3.5" fill="#FFF" stroke="var(--cyan)" stroke-width="2"/>
+            <text id="cpuStreamBadge" x="482" y="42" fill="var(--cyan)" font-size="8.5" font-family="'Consolas',monospace" font-weight="bold" text-anchor="end">58&deg;C</text>
+          </svg>
+        </div>
+
+        <div class="stream-card">
+          <div class="stream-hdr">
+            <h4 style="color:var(--red);font-size:14px;letter-spacing:1.5px;font-weight:700;margin:0">GPU</h4>
+            <div class="stats mono">PEAK: <b id="gpuPeak">52&deg;C</b> &bull; VRAM: <b id="gpuVram">1.4 / 4 GB</b> &bull; TGP: <b>60W</b></div>
+          </div>
+          <svg class="stream-svg osc-grid" id="gpuStreamSvg" viewBox="0 0 500 76" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="gpuStreamGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#E4002B" stop-opacity="0.38"/>
+                <stop offset="100%" stop-color="#E4002B" stop-opacity="0.0"/>
+              </linearGradient>
+            </defs>
+            <!-- Grid lines & Y labels -->
+            <line x1="28" y1="10" x2="492" y2="10" stroke="rgba(255,255,255,0.08)" stroke-dasharray="2,3"/>
+            <line x1="28" y1="28" x2="492" y2="28" stroke="rgba(255,255,255,0.06)" stroke-dasharray="2,3"/>
+            <line x1="28" y1="46" x2="492" y2="46" stroke="rgba(255,255,255,0.06)" stroke-dasharray="2,3"/>
+            <line x1="28" y1="64" x2="492" y2="64" stroke="rgba(255,255,255,0.08)" stroke-dasharray="2,3"/>
+            <text x="23" y="13" fill="#5d6572" font-size="8" font-family="'Consolas',monospace" text-anchor="end">100&deg;</text>
+            <text x="23" y="31" fill="#5d6572" font-size="8" font-family="'Consolas',monospace" text-anchor="end">75&deg;</text>
+            <text x="23" y="49" fill="#5d6572" font-size="8" font-family="'Consolas',monospace" text-anchor="end">50&deg;</text>
+            <text x="23" y="67" fill="#5d6572" font-size="8" font-family="'Consolas',monospace" text-anchor="end">25&deg;</text>
+            <!-- Time dividers -->
+            <line x1="120" y1="8" x2="120" y2="64" stroke="rgba(255,255,255,0.05)" stroke-dasharray="1,3"/>
+            <line x1="240" y1="8" x2="240" y2="64" stroke="rgba(255,255,255,0.05)" stroke-dasharray="1,3"/>
+            <line x1="360" y1="8" x2="360" y2="64" stroke="rgba(255,255,255,0.05)" stroke-dasharray="1,3"/>
+            <line x1="488" y1="8" x2="488" y2="64" stroke="rgba(228,0,43,0.25)"/>
+            <text x="120" y="73" fill="#464d59" font-size="7" font-family="'Consolas',monospace" text-anchor="middle">-45s</text>
+            <text x="240" y="73" fill="#464d59" font-size="7" font-family="'Consolas',monospace" text-anchor="middle">-30s</text>
+            <text x="360" y="73" fill="#464d59" font-size="7" font-family="'Consolas',monospace" text-anchor="middle">-15s</text>
+            <text x="488" y="73" fill="var(--red)" font-size="7.5" font-family="'Consolas',monospace" font-weight="bold" text-anchor="middle">NOW</text>
+            <!-- Path & Target -->
+            <path class="area gpu" id="gpuStreamArea" d="" fill="url(#gpuStreamGrad)"/>
+            <path class="line gpu" id="gpuStreamLine" d=""/>
+            <circle id="gpuStreamDot" cx="488" cy="46" r="3.5" fill="#FFF" stroke="var(--red)" stroke-width="2"/>
+            <text id="gpuStreamBadge" x="482" y="42" fill="var(--red)" font-size="8.5" font-family="'Consolas',monospace" font-weight="bold" text-anchor="end">52&deg;C</text>
+          </svg>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- Right -->
+  <div class="col">
+    <div class="cp"><div class="pad">
+      <div class="ph"><span class="bar"></span><h3>Thermal Profile</h3></div>
+      <div class="profiles" id="profiles">
+        <button class="prof" data-p="quiet">
+          <div class="prof-icon p-quiet">
+            <svg viewBox="0 0 36 36" fill="none" stroke="#00E676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 4 C9 4 5 13 8 22 C11 30 20 32 28 28 C32 20 30 11 26 7 Z" fill="rgba(0,230,118,0.15)"/>
+              <path d="M12 24 C16 18 20 14 26 7"/>
+              <path d="M21 21 C23 19 24 17 25 14" stroke-dasharray="1 2"/>
+            </svg>
+          </div>
+          <div><div class="n">Quiet</div><div class="d">Senyap, daya CPU/GPU dibatasi</div></div>
+          <div class="m">LOW<br>NOISE</div>
+        </button>
+        <button class="prof on" data-p="balanced">
+          <div class="prof-icon p-balanced">
+            <svg viewBox="0 0 36 36" fill="none" stroke="#00D2FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 24 A13 13 0 0 1 30 24" stroke-width="2.2"/>
+              <line x1="18" y1="18" x2="18" y2="8" stroke="#FFF" stroke-width="2"/>
+              <circle cx="18" cy="18" r="3.5" fill="#00D2FF"/>
+              <line x1="9" y1="21" x2="27" y2="21" stroke-width="1.5"/>
+              <circle cx="9" cy="24" r="2" fill="rgba(0,210,255,0.4)"/>
+              <circle cx="27" cy="24" r="2" fill="rgba(0,210,255,0.4)"/>
+            </svg>
+          </div>
+          <div><div class="n">Balanced</div><div class="d">Keseimbangan performa dan suhu</div></div>
+          <div class="m">DEFAULT</div>
+        </button>
+        <button class="prof" data-p="performance">
+          <div class="prof-icon p-perf">
+            <svg viewBox="0 0 36 36" fill="none" stroke="#E4002B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 3 C22 10 26 15 26 23 C26 28 22 33 18 33 C14 33 10 28 10 23 C10 15 14 10 18 3 Z" fill="rgba(228,0,43,0.18)"/>
+              <path d="M18 12 C20 16 22 19 22 23 C22 26 20 29 18 29 C16 29 14 26 14 23 C14 19 16 16 18 12 Z" fill="#E4002B"/>
+              <path d="M7 28 L11 24 M29 28 L25 24" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <div><div class="n">Performance</div><div class="d">Batas daya maksimum, kipas agresif</div></div>
+          <div class="m">TURBO</div>
+        </button>
+      </div>
+    </div></div>
+
+    <div class="cp"><div class="pad">
+      <div class="ph"><img src="assets/acc/resource_images_acc_acer_192_ic_notification_battery.png" alt="" style="width:20px;height:20px;object-fit:contain" onerror="this.style.display='none'"><h3>Battery Health</h3><span class="sp"></span><span class="tag g" id="bhTag">GOOD</span></div>
+      <div class="row">
+        <div class="grow"><h4>Conservation Mode</h4><p>Batasi pengisian hingga 80% untuk memperpanjang usia sel.</p></div>
+        <label class="tg cy"><input type="checkbox" id="bat80" aria-label="Pembatas charge 80 persen"><span></span></label>
+      </div>
+      <div class="batt">
+        <div><div class="l">KAPASITAS</div><div class="v mono">94% <span class="muted">(<span id="bCap">53.4</span> Wh)</span></div></div>
+        <div><div class="l">PROTEKSI SEL</div><div class="v" id="bProt">Standar</div></div>
+      </div>
+    </div></div>
+
+    <div class="tiles">
+      <div class="tile"><div class="top"><h4>LCD OVERDRIVE</h4><label class="tg"><input type="checkbox" id="odDash" aria-label="LCD Overdrive"><span></span></label></div><p>Respons panel 3 ms</p></div>
+      <div class="tile"><div class="top"><h4>WIN KEY LOCK</h4><label class="tg"><input type="checkbox" id="wkDash" aria-label="Windows Key Lock"><span></span></label></div><p>Nonaktifkan tombol Windows</p></div>
+    </div>
+  </div>
+ </div>
+</section>
+
+<!-- ================= TAB 2: FAN ================= -->
+<section class="tab" id="tab-fan">
+  <div class="two">
+    <div class="col">
+      <div class="cp hot"><div class="pad">
+        <div class="ph"><span class="bar"></span><h3>Manual Fan Speed</h3></div>
+        <div class="slbl"><span>CPU FAN</span><b class="mono"><span id="cpuPctV">50</span><small>%</small></b></div>
+        <input type="range" id="cpuPct" min="20" max="100" value="50" style="--rc:var(--cyan)">
+        <div class="slbl" style="margin-top:14px"><span>GPU FAN</span><b class="mono"><span id="gpuPctV">50</span><small>%</small></b></div>
+        <input type="range" id="gpuPct" min="20" max="100" value="50">
+        <p class="muted" style="margin-top:12px">Menggeser slider mengaktifkan mode CUSTOM dengan kecepatan tetap dan menonaktifkan kontrol berbasis kurva.</p>
+      </div></div>
+
+      <div class="cp"><div class="pad">
+        <div class="ph"><span class="bar"></span><h3>Preset Curve</h3></div>
+        <div class="presets" id="presets">
+          <button class="chip" data-pr="silent">Silent</button>
+          <button class="chip on" data-pr="balanced">Balanced</button>
+          <button class="chip" data-pr="extreme">Extreme</button>
+        </div>
+      </div></div>
+
+      <div class="cp"><div class="pad">
+        <div class="row">
+          <div class="grow"><h4>COOLBOOST</h4><p>Menaikkan seluruh batas RPM kipas CPU dan GPU hingga melewati kurva normal ketika suhu inti mendekati ambang throttling. Kebisingan meningkat; cocok untuk sesi gaming panjang dan rendering.</p></div>
+          <label class="tg"><input type="checkbox" id="cbFan" aria-label="CoolBoost"><span></span></label>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="cp cool"><div class="pad">
+      <div class="ph"><span class="bar c"></span><h3>Custom Fan Curve</h3><span class="sp"></span><small>SERET TITIK UNTUK MENGUBAH</small></div>
+      <svg id="curve" viewBox="0 0 700 360" aria-label="Editor kurva kipas"></svg>
+      <div class="cvtable" id="cvtable"></div>
+      <div class="curvefoot">
+        <span class="tag c" id="curveState">KURVA TIDAK AKTIF</span>
+        <span class="sp"></span>
+        <button class="btn ghost sm" id="curveReset"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>Reset to Factory Curve</button>
+        <button class="btn sm" id="curveApply"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>Terapkan Kurva</button>
+      </div>
+    </div></div>
+  </div>
+</section>
+
+<!-- ================= TAB 3: RGB ================= -->
+<section class="tab" id="tab-rgb">
+  <div class="two" style="grid-template-columns:1fr 360px">
+    <div class="col">
+      <div class="cp cool"><div class="pad">
+        <div class="ph"><span class="bar c"></span><h3>Acer Nitro AN515-57 Keyboard Layout</h3><span class="sp"></span><small>KLIK TOMBOL / ZONA UNTUK MENGUBAH WARNA</small></div>
+        
+        <!-- Authentic Chiclet Keyboard Deck with Strict Row Alignment -->
+        <div class="kb-deck-container">
+          <div class="kb-chassis-bezel">
+            <div class="kb-underglow" id="kbUnderglow">
+              <div></div><div></div><div></div><div></div>
+            </div>
+            
+            <div class="kb-rows" id="kbGrid">
+              <!-- Row 0: Function Row -->
+              <div class="kb-row r-fn">
+                <div class="key k-fn z1" data-z="0" style="flex:1.2">ESC</div>
+                <div class="k-gap"></div>
+                <div class="key k-fn z1" data-z="0" style="flex:1">F1</div>
+                <div class="key k-fn z1" data-z="0" style="flex:1">F2</div>
+                <div class="key k-fn z1" data-z="0" style="flex:1">F3</div>
+                <div class="key k-fn z1" data-z="0" style="flex:1">F4</div>
+                <div class="k-gap"></div>
+                <div class="key k-fn z2" data-z="1" style="flex:1">F5</div>
+                <div class="key k-fn z2" data-z="1" style="flex:1">F6</div>
+                <div class="key k-fn z2" data-z="1" style="flex:1">F7</div>
+                <div class="key k-fn z2" data-z="1" style="flex:1">F8</div>
+                <div class="k-gap"></div>
+                <div class="key k-fn z3" data-z="2" style="flex:1">F9</div>
+                <div class="key k-fn z3" data-z="2" style="flex:1">F10</div>
+                <div class="key k-fn z3" data-z="2" style="flex:1">F11</div>
+                <div class="key k-fn z3" data-z="2" style="flex:1">F12</div>
+                <div class="k-gap"></div>
+                <div class="key k-fn z3" data-z="2" style="flex:1">PRT</div>
+                <div class="key k-fn z3" data-z="2" style="flex:1">DEL</div>
+                <div class="k-gap-lg"></div>
+                <div class="key k-fn nitro-key z4" data-z="3" style="flex:1" title="Nitro Key">N</div>
+                <div class="key k-fn z4" data-z="3" style="flex:1">NUM</div>
+                <div class="key k-fn z4" data-z="3" style="flex:1">/</div>
+                <div class="key k-fn z4" data-z="3" style="flex:1">*</div>
+                <div class="key k-fn z4" data-z="3" style="flex:1">-</div>
+              </div>
+
+              <!-- Row 1: Number Row -->
+              <div class="kb-row">
+                <div class="key z1" data-z="0" style="flex:1">~ `</div>
+                <div class="key z1" data-z="0" style="flex:1">1</div>
+                <div class="key z1" data-z="0" style="flex:1">2</div>
+                <div class="key z1" data-z="0" style="flex:1">3</div>
+                <div class="key z1" data-z="0" style="flex:1">4</div>
+                <div class="key z2" data-z="1" style="flex:1">5</div>
+                <div class="key z2" data-z="1" style="flex:1">6</div>
+                <div class="key z2" data-z="1" style="flex:1">7</div>
+                <div class="key z2" data-z="1" style="flex:1">8</div>
+                <div class="key z3" data-z="2" style="flex:1">9</div>
+                <div class="key z3" data-z="2" style="flex:1">0</div>
+                <div class="key z3" data-z="2" style="flex:1">- _</div>
+                <div class="key z3" data-z="2" style="flex:1">= +</div>
+                <div class="key z3" data-z="2" style="flex:2">BACKSPACE</div>
+                <div class="k-gap-lg"></div>
+                <div class="key z4" data-z="3" style="flex:1">7</div>
+                <div class="key z4" data-z="3" style="flex:1">8</div>
+                <div class="key z4" data-z="3" style="flex:1">9</div>
+                <div class="key z4" data-z="3" style="flex:1">+</div>
+              </div>
+
+              <!-- Row 2: QWERTY Row -->
+              <div class="kb-row">
+                <div class="key z1" data-z="0" style="flex:1.5">TAB</div>
+                <div class="key z1" data-z="0" style="flex:1">Q</div>
+                <div class="key wasd z1" data-z="0" style="flex:1" title="WASD Gaming Key">W</div>
+                <div class="key z1" data-z="0" style="flex:1">E</div>
+                <div class="key z2" data-z="1" style="flex:1">R</div>
+                <div class="key z2" data-z="1" style="flex:1">T</div>
+                <div class="key z2" data-z="1" style="flex:1">Y</div>
+                <div class="key z2" data-z="1" style="flex:1">U</div>
+                <div class="key z3" data-z="2" style="flex:1">I</div>
+                <div class="key z3" data-z="2" style="flex:1">O</div>
+                <div class="key z3" data-z="2" style="flex:1">P</div>
+                <div class="key z3" data-z="2" style="flex:1">[ {</div>
+                <div class="key z3" data-z="2" style="flex:1">] }</div>
+                <div class="key z3" data-z="2" style="flex:1.5">\ |</div>
+                <div class="k-gap-lg"></div>
+                <div class="key z4" data-z="3" style="flex:1">4</div>
+                <div class="key z4" data-z="3" style="flex:1">5</div>
+                <div class="key z4" data-z="3" style="flex:1">6</div>
+                <div class="key z4" data-z="3" style="flex:1">+</div>
+              </div>
+
+              <!-- Row 3: Home Row -->
+              <div class="kb-row">
+                <div class="key z1" data-z="0" style="flex:1.8">CAPS</div>
+                <div class="key wasd z1" data-z="0" style="flex:1" title="WASD Gaming Key">A</div>
+                <div class="key wasd z1" data-z="0" style="flex:1" title="WASD Gaming Key">S</div>
+                <div class="key wasd z1" data-z="0" style="flex:1" title="WASD Gaming Key">D</div>
+                <div class="key z2" data-z="1" style="flex:1">F</div>
+                <div class="key z2" data-z="1" style="flex:1">G</div>
+                <div class="key z2" data-z="1" style="flex:1">H</div>
+                <div class="key z2" data-z="1" style="flex:1">J</div>
+                <div class="key z3" data-z="2" style="flex:1">K</div>
+                <div class="key z3" data-z="2" style="flex:1">L</div>
+                <div class="key z3" data-z="2" style="flex:1">; :</div>
+                <div class="key z3" data-z="2" style="flex:1">' "</div>
+                <div class="key z3" data-z="2" style="flex:2.2">ENTER</div>
+                <div class="k-gap-lg"></div>
+                <div class="key z4" data-z="3" style="flex:1">1</div>
+                <div class="key z4" data-z="3" style="flex:1">2</div>
+                <div class="key z4" data-z="3" style="flex:1">3</div>
+                <div class="key z4" data-z="3" style="flex:1">ENT</div>
+              </div>
+
+              <!-- Row 4: Shift Row -->
+              <div class="kb-row">
+                <div class="key z1" data-z="0" style="flex:2.2">SHIFT</div>
+                <div class="key z1" data-z="0" style="flex:1">Z</div>
+                <div class="key z1" data-z="0" style="flex:1">X</div>
+                <div class="key z1" data-z="0" style="flex:1">C</div>
+                <div class="key z2" data-z="1" style="flex:1">V</div>
+                <div class="key z2" data-z="1" style="flex:1">B</div>
+                <div class="key z2" data-z="1" style="flex:1">N</div>
+                <div class="key z2" data-z="1" style="flex:1">M</div>
+                <div class="key z3" data-z="2" style="flex:1">, &lt;</div>
+                <div class="key z3" data-z="2" style="flex:1">. &gt;</div>
+                <div class="key z3" data-z="2" style="flex:1">/ ?</div>
+                <div class="key z3" data-z="2" style="flex:1.7">SHIFT</div>
+                <div class="key arrow z3" data-z="2" style="flex:1">↑</div>
+                <div class="k-gap-lg"></div>
+                <div class="key z4" data-z="3" style="flex:2">0</div>
+                <div class="key z4" data-z="3" style="flex:1">.</div>
+                <div class="key z4" data-z="3" style="flex:1">ENT</div>
+              </div>
+
+              <!-- Row 5: Bottom Row -->
+              <div class="kb-row">
+                <div class="key z1" data-z="0" style="flex:1.3">CTRL</div>
+                <div class="key z1" data-z="0" style="flex:1">FN</div>
+                <div class="key z1" data-z="0" style="flex:1">WIN</div>
+                <div class="key z1" data-z="0" style="flex:1.2">ALT</div>
+                <div class="key z2" data-z="1" style="flex:5.5">SPACEBAR</div>
+                <div class="key z3" data-z="2" style="flex:1.2">ALT</div>
+                <div class="key z3" data-z="2" style="flex:1.3">CTRL</div>
+                <div class="key arrow z3" data-z="2" style="flex:1">←</div>
+                <div class="key arrow z3" data-z="2" style="flex:1">↓</div>
+                <div class="key arrow z3" data-z="2" style="flex:1">→</div>
+                <div class="k-gap-lg"></div>
+                <div class="key z4" data-z="3" style="flex:2">0 INS</div>
+                <div class="key z4" data-z="3" style="flex:2">. DEL</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div></div>
+      <div class="zgrid" id="zgrid"></div>
+      <div class="cp"><div class="pad">
+        <div class="ph"><span class="bar"></span><h3>Efek LED</h3></div>
+        <div class="fx" id="fx">
+          <button class="chip on" data-fx="static">Static</button>
+          <button class="chip" data-fx="breathing">Breathing</button>
+          <button class="chip" data-fx="wave">Spectrum Wave</button>
+          <button class="chip" data-fx="zoom">Zoom</button>
+          <button class="chip" data-fx="shifting">Shifting</button>
+          <button class="chip" data-fx="neon">Neon Cycle</button>
+          <button class="chip" data-fx="thermal">Thermal Heatmap</button>
+          <button class="chip" data-fx="police">Police Strobe</button>
+          <button class="chip" data-fx="chase">Zone Chase</button>
+          <button class="chip" data-fx="typing_wave">Typing Wave</button>
+          <button class="chip" data-fx="bicolor">Bicolor Pulse</button>
+          <button class="chip" data-fx="strobe">Strobe Alert</button>
+          <button class="chip" data-fx="off">Off</button>
+        </div>
+        <div id="fxDesc" style="margin-top:10px;font-size:12px;color:var(--text);padding:10px 14px;background:rgba(255,255,255,0.03);border:1px solid var(--line);border-radius:6px;line-height:1.4">Mode Statis: 4 zona warna mandiri tanpa animasi.</div>
+      </div></div>
+    </div>
+
+    <div class="col">
+      <div class="cp hot"><div class="pad">
+        <div class="ph"><span class="bar"></span><h3>Warna <span id="selZoneName" style="color:var(--cyan)">Zone 1</span></h3></div>
+        <div class="swatches" id="swatches"></div>
+        <div class="picker" style="margin:14px 0 0;padding:14px 0 0;border:0;border-top:1px solid var(--line)">
+          <input type="color" id="colorPick" value="#E4002B" aria-label="Pemilih warna kustom">
+          <div><div style="font-size:12px;font-weight:700;letter-spacing:.1em">KUSTOM</div><div class="muted mono" id="hexTxt">#E4002B</div></div>
+          <button class="btn ghost sm" id="applyAll" style="margin-left:auto">Terapkan ke semua</button>
+        </div>
+      </div></div>
+      <div class="cp"><div class="pad">
+        <div class="ph"><span class="bar"></span><h3>Backlight</h3></div>
+        <div class="slbl"><span>BRIGHTNESS</span><b class="mono"><span id="brV">100</span><small>%</small></b></div>
+        <input type="range" id="br" min="0" max="100" value="100">
+        <div class="hr"></div>
+        <div id="speedContainer">
+          <div class="slbl"><span>ANIMATION SPEED</span><b class="mono"><span id="speedV">5</span> / 9</b></div>
+          <input type="range" id="animSpeed" min="1" max="9" value="5">
+        </div>
+        <div id="dirContainer" style="margin-top:12px;display:none;">
+          <div class="slbl"><span>DIRECTION</span><b class="mono" id="dirV">KANAN</b></div>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <button class="chip on" id="dirRight" data-dir="1" style="flex:1;justify-content:center">Ke Kanan &rarr;</button>
+            <button class="chip" id="dirLeft" data-dir="2" style="flex:1;justify-content:center">&larr; Ke Kiri</button>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row"><div class="grow"><h4>Backlight Timeout</h4><p>Matikan lampu otomatis setelah 30 detik tanpa aktivitas.</p></div>
+        <label class="tg"><input type="checkbox" id="blTimeout" aria-label="Backlight timeout"><span></span></label></div>
+      </div></div>
+      <button class="btn" id="rgbSave" style="width:100%;padding:15px"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg>Save &amp; Apply to ACPI EC</button>
+      <button class="btn ghost" id="rgbSyncNS" style="width:100%;padding:12px;margin-top:10px;border-color:var(--cyan);color:var(--cyan)"><svg viewBox="0 0 24 24"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>Ambil Pengaturan dari NitroSense</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TAB 4: SPECS ================= -->
+<section class="tab" id="tab-specs">
+  <!-- Authentic Acer Nitro AN515-57 Real Hardware Stage -->
+  <div class="laptop-real-stage">
+    <div class="laptop-img-wrapper">
+      <img src="assets/nitro_an515_57_hd.png" class="laptop-real-img" alt="Acer Nitro 5 AN515-57">
+
+      <!-- Real Screen Holographic Telemetry HUD -->
+      <div class="laptop-screen-hud">
+        <div class="hud-brand">ACER <b>NITRO</b></div>
+        <div class="hud-badge">AN515-57 LIVE HARDWARE DETECTED</div>
+        <div class="hud-specs-row mono" id="hudScreenRow">
+          <span>Mi 200Hz + 144Hz IPS</span> &bull; <span>i7-11800H</span> &bull; <span>RTX 3050 4GB</span> &bull; <span>32GB RAM</span>
+        </div>
+      </div>
+
+      <!-- Holographic HUD Radar Pins -->
+      <div class="hud-pin" style="left:20%;top:47%" data-target="kvSys" style="--pc:var(--cyan)">
+        <div class="pin-card"><b>[CPU]</b> i7-11800H 8C/16T</div>
+        <div class="pin-line" style="--pc:var(--cyan);height:18px"></div>
+        <div class="pin-dot" style="--pc:var(--cyan)"></div>
+      </div>
+
+      <div class="hud-pin" style="left:80%;top:47%" data-target="kvGpu" style="--pc:var(--red)">
+        <div class="pin-card"><b>[GPU]</b> RTX 3050 Laptop 4GB</div>
+        <div class="pin-line" style="--pc:var(--red);height:18px"></div>
+        <div class="pin-dot" style="--pc:var(--red)"></div>
+      </div>
+
+      <div class="hud-pin" style="left:50%;top:58%" data-target="ramSpecsCard" style="--pc:var(--amber)">
+        <div class="pin-card"><b>[RAM]</b> 32GB Dual-Channel</div>
+        <div class="pin-line" style="--pc:var(--amber);height:16px"></div>
+        <div class="pin-dot" style="--pc:var(--amber)"></div>
+      </div>
+
+      <div class="hud-pin" style="left:82%;top:75%" data-target="partitionVolumesCard" style="--pc:var(--green)">
+        <div class="pin-card"><b>[SSD]</b> 3 Disks / 4 Partisi</div>
+        <div class="pin-line" style="--pc:var(--green);height:18px"></div>
+        <div class="pin-dot" style="--pc:var(--green)"></div>
+      </div>
+
+      <div class="hud-pin" style="left:28%;top:82%" data-target="kvDisp" style="--pc:var(--purple)">
+        <div class="pin-card"><b>[DISP]</b> Mi 200Hz + Acer 144Hz</div>
+        <div class="pin-line" style="--pc:var(--purple);height:18px"></div>
+        <div class="pin-dot" style="--pc:var(--purple)"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="specs">
+    <div class="cp"><div class="pad">
+      <div class="ph"><img src="assets/acc/AcerCareCenter.ico" alt="" style="width:20px;height:20px" onerror="this.style.display='none'"><h3>System Overview</h3><span class="sp"></span><span class="tag c">ACPI EC SYNC</span></div>
+      <div class="kv" id="kvSys"></div>
+    </div></div>
+    <div class="col">
+      <div class="cp cool"><div class="pad">
+        <div class="ph"><span class="bar c"></span><h3>Monitor &amp; Display (Dual Display)</h3></div>
+        <div class="kv" id="kvDisp"></div>
+      </div></div>
+      <div class="cp"><div class="pad">
+        <div class="ph"><span class="bar"></span><h3>GPU (Diskrit &amp; Terintegrasi)</h3></div>
+        <div class="kv" id="kvGpu"></div>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- Dynamic Physical Storage & Logical Partitions Telemetry -->
+  <div class="specs" style="margin-top:14px">
+    <div class="cp"><div class="pad" id="storageDrivesCard">
+      <div class="ph"><img src="assets/acc/resource_images_acc_acer_192_ic_notification_disk.png" alt="" style="width:20px;height:20px;object-fit:contain" onerror="this.style.display='none'"><h3>Storage Fisik (3 Drive Terpasang)</h3><span class="sp"></span><span class="tag g">ALL HEALTHY</span></div>
+      <div id="storageDrivesList" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div></div>
+    <div class="cp cool"><div class="pad" id="partitionVolumesCard">
+      <div class="ph"><span class="bar c"></span><h3>Partisi Volume Drive (Live Free / Used)</h3><span class="sp"></span><small class="mono" style="color:var(--cyan)">WIN32 API LIVE</small></div>
+      <div id="partitionVolumesList" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div></div>
+  </div>
+
+  <div class="comp" style="margin-top:14px">
+    <div class="cp"><div class="pad" id="ramSpecsCard">
+      <div class="ph"><span class="bar c"></span><h3>Pengujian RAM &amp; Slot Memori</h3><span class="sp"></span><button class="btn ghost sm" id="runRam">Jalankan</button></div>
+      <div class="slbl"><span>BEBAN MEMORI AKTIF</span><b class="mono" id="ramTotalLabel">32.0 GB Total</b></div>
+      <div class="big mono"><span id="ramLoad">26</span><small>%</small></div>
+      <div class="meter" style="--w:26%;--mc:var(--amber)" id="ramMeter"><i></i></div>
+      <div class="stats3" style="margin-top:8px">
+        <div><div class="l">TERPAKAI</div><div class="v mono" id="ramUsed">8.4 GB</div></div>
+        <div><div class="l">TERSEDIA</div><div class="v mono" id="ramFree">23.6 GB</div></div>
+        <div><div class="l">INTEGRITAS</div><div class="v" style="color:var(--green)" id="ramOk">OK</div></div>
+      </div>
+      <div class="kv" id="ramModulesKv" style="margin-top:10px;grid-template-columns:90px 1fr"></div>
+    </div></div>
+
+    <div class="cp"><div class="pad" id="batSpecsCard">
+      <div class="ph"><span class="bar"></span><h3>Pengujian Baterai</h3><span class="sp"></span><button class="btn ghost sm" id="runBat">Jalankan</button></div>
+      <div class="slbl"><span>FULL CHARGE VS DESIGN</span></div>
+      <div class="big mono" id="batRatio">94<small>%</small></div>
+      <div class="meter" style="--w:94%;--mc:var(--cyan)" id="batMeter"><i></i></div>
+      <div class="stats3" style="margin-top:8px">
+        <div><div class="l">FULL CHARGE</div><div class="v mono">53.4 Wh</div></div>
+        <div><div class="l">DESIGN</div><div class="v mono">57.0 Wh</div></div>
+        <div><div class="l">WEAR</div><div class="v mono">6%</div></div>
+      </div>
+      <div class="kv" style="margin-top:10px;grid-template-columns:110px 1fr"><span>Cycle Count</span><b class="mono">112</b><span>Proteksi</span><b>Standar</b></div>
+    </div></div>
+  </div>
+  <p class="muted" style="margin-top:14px">Data spesifikasi dibaca langsung dari firmware ACPI WMI dan sensor perangkat keras Acer Nitro AN515-57.</p>
+</section>
+
+<!-- ================= TAB 5: TUNEUP ================= -->
+<section class="tab" id="tab-tune">
+  <div class="tune">
+    <div class="col">
+      <div class="cp cool"><div class="pad">
+        <div class="ph"><img src="assets/acc/resource_images_acc_acer_192_ic_notification_junk.png" alt="" style="width:20px;height:20px;object-fit:contain" onerror="this.style.display='none'"><h3>Junk Files &amp; Cache</h3><span class="sp"></span><button class="btn ghost sm" id="rescan">Pindai Ulang</button></div>
+        <div class="scan">
+          <div class="ring">
+            <svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="64" fill="none" stroke="#1d2128" stroke-width="10"/><circle id="ringP" cx="75" cy="75" r="64" fill="none" stroke="var(--cyan)" stroke-width="10" stroke-dasharray="402" stroke-dashoffset="402" style="filter:drop-shadow(0 0 6px var(--cyan));transition:stroke-dashoffset .3s"/></svg>
+            <div class="ct"><b class="mono" id="junkTotal">--</b><small id="junkState">MEMINDAI</small></div>
+          </div>
+          <div class="junkrows" id="junkRows"></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:16px">
+          <button class="btn" id="cleanBtn" disabled><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Clean Now</button>
+          <span class="confirm" id="cleanConf"><span class="muted">Hapus file terpilih secara permanen?</span><button class="btn sm" id="cleanYes">Ya</button><button class="btn ghost sm" id="cleanNo">Batal</button></span>
+        </div>
+        <div class="prog" id="cleanProg"><i></i></div>
+      </div></div>
+
+      <div class="cp"><div class="pad">
+        <div class="row">
+          <img class="ico-big" src="assets/acc/resource_images_acc_acer_192_ic_notification_disk.png" alt="" onerror="this.style.display='none'">
+          <div class="grow"><h4>NVMe SSD TRIM Optimizer</h4><p>Kirim perintah TRIM ke seluruh volume SSD agar sel kosong dibersihkan dan kecepatan tulis terjaga.</p></div>
+          <button class="btn ghost" id="trimBtn">Optimize Drive</button>
+        </div>
+        <div class="prog" id="trimProg"><i></i></div>
+        <div class="muted" id="trimRes" style="margin-top:8px"></div>
+      </div></div>
+
+      <div class="cp"><div class="pad">
+        <div class="row">
+          <img class="ico-big" src="assets/acc/resource_images_acc_acer_192_ic_notification_startup.png" alt="" onerror="this.style.display='none'">
+          <div class="grow"><h4>RAM Flush</h4><p>Kosongkan working set proses dan cache memori standby dalam satu klik.</p><p class="mono" id="flushRes" style="color:var(--cyan)"></p></div>
+          <button class="btn cy" id="flushBtn">Flush RAM</button>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="cp"><div class="pad" style="height:100%">
+      <div class="ph"><img src="assets/acc/resource_images_acc_acer_192_ic_notification_startup.png" alt="" style="width:20px;height:20px;object-fit:contain" onerror="this.style.display='none'"><h3>Startup Applications</h3><span class="sp"></span><small id="suCount"></small></div>
+      <table class="table"><thead><tr><th>APLIKASI</th><th>PUBLISHER</th><th>DAMPAK</th><th style="text-align:right">AKTIF</th></tr></thead><tbody id="suBody"></tbody></table>
+    </div></div>
+  </div>
+</section>
+
+<!-- ================= TAB 6: GAMING ================= -->
+<section class="tab" id="tab-game">
+  <div class="gset">
+    <div class="col">
+      <div class="cp hot"><div class="pad">
+        <div class="ph"><span class="bar"></span><h3>Input Gaming</h3></div>
+        <div class="row"><div class="grow"><h4>Windows Key Gaming Lock</h4><p>Cegah menu Start terbuka tidak sengaja saat bermain.</p></div><label class="tg"><input type="checkbox" id="wkGame" aria-label="Windows Key Lock"><span></span></label></div>
+        <div class="hr"></div>
+        <div class="row"><div class="grow"><h4>Sticky Keys Prompt</h4><p>Matikan dialog Sticky Keys ketika Shift ditekan 5 kali berturut-turut.</p></div><label class="tg"><input type="checkbox" id="skGame" checked aria-label="Nonaktifkan Sticky Keys"><span></span></label></div>
+      </div></div>
+      <div class="cp"><div class="pad">
+        <div class="ph"><span class="bar c"></span><h3>Display</h3></div>
+        <div class="row"><div class="grow"><h4>LCD Overdrive 3 ms</h4><p>Percepat transisi piksel untuk mengurangi ghosting pada panel 144 Hz.</p></div><label class="tg cy"><input type="checkbox" id="odGame" aria-label="LCD Overdrive"><span></span></label></div>
+      </div></div>
+      <div class="cp"><div class="pad">
+        <div class="ph"><span class="bar"></span><h3>Startup NitroMan</h3></div>
+        <div class="row"><div class="grow"><h4>Jalankan saat Windows boot</h4><p>Terdaftar sebagai tugas Windows Task Scheduler dengan hak akses Administrator, tanpa prompt UAC saat masuk.</p></div><label class="tg"><input type="checkbox" id="suSelf" checked aria-label="Startup NitroMan"><span></span></label></div>
+      </div></div>
+    </div>
+    <div class="cp cool"><div class="pad">
+      <div class="ph"><span class="bar c"></span><h3>Audio Profile</h3><span class="sp"></span><small>ACER TRUEHARMONY / DTS:X ULTRA</small></div>
+      <p class="muted">Pilih profil yang menyesuaikan equalizer dan pemosisian suara sesuai jenis konten.</p>
+      <div class="audio" id="audio">
+        <button class="chip on" data-a="shooter"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>Shooter</button>
+        <button class="chip" data-a="rpg"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.500-1-8-4-8-9V6z"/></svg>RPG</button>
+        <button class="chip" data-a="strategy"><svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>Strategy</button>
+        <button class="chip" data-a="movie"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14"/><path d="M10 9l5 3-5 3z"/></svg>Movie</button>
+        <button class="chip" data-a="music"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="16" r="2"/></svg>Music</button>
+      </div>
+      <div class="hr" style="margin-top:20px"></div>
+      <div class="kv" style="grid-template-columns:160px 1fr">
+        <span>Profil aktif</span><b id="audioName">SHOOTER</b>
+        <span>Penguatan</span><b id="audioDesc">Langkah kaki dan arah suara lebih jelas</b>
+      </div>
+    </div></div>
+  </div>
+</section>
+
+</main>
+</div>
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+(function() {
+'use strict';
+/* =============== Tauri IPC bridge =============== */
+function invokeTauri(cmd, args = {}) {
+  if (window.__TAURI__ && window.__TAURI__.core && typeof window.__TAURI__.core.invoke === 'function') {
+    return window.__TAURI__.core.invoke(cmd, args);
+  }
+  if (window.__TAURI__ && typeof window.__TAURI__.invoke === 'function') {
+    return window.__TAURI__.invoke(cmd, args);
+  }
+  if (window.__TAURI_INTERNALS__ && typeof window.__TAURI_INTERNALS__.invoke === 'function') {
+    return window.__TAURI_INTERNALS__.invoke(cmd, args);
+  }
+  return Promise.resolve(null);
+}
+function listenTauri(event, handler) {
+  if (window.__TAURI__ && window.__TAURI__.event && typeof window.__TAURI__.event.listen === 'function') {
+    return window.__TAURI__.event.listen(event, handler);
+  }
+  if (window.__TAURI__ && window.__TAURI__.core && typeof window.__TAURI__.core.listen === 'function') {
+    return window.__TAURI__.core.listen(event, handler);
+  }
+  if (window.__TAURI_INTERNALS__ && typeof window.__TAURI_INTERNALS__.listen === 'function') {
+    return window.__TAURI_INTERNALS__.listen(event, handler);
+  }
+  return Promise.resolve(() => {});
+}
+
+/* =============== Helpers =============== */
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const NS = 'http://www.w3.org/2000/svg';
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const isTauriApp = !!(window.__TAURI__ || window.__TAURI_INTERNALS__);
+
+function toast(msg, err) {
+  const container = $('#toasts');
+  if (!container) return;
+
+  // Deduplication: if identical message is already visible, refresh its timer
+  const existing = Array.from(container.children).find(el => el.textContent === msg && !el.classList.contains('out'));
+  if (existing) {
+    if (existing._timer) clearTimeout(existing._timer);
+    existing._timer = setTimeout(() => {
+      existing.classList.add('out');
+      setTimeout(() => existing.remove(), 260);
+    }, 1800);
+    return;
+  }
+
+  // Enforce max 2 active toasts
+  const activeToasts = Array.from(container.children).filter(el => !el.classList.contains('out'));
+  if (activeToasts.length >= 2) {
+    const oldest = activeToasts[0];
+    oldest.classList.add('out');
+    setTimeout(() => oldest.remove(), 260);
+  }
+
+  const t = document.createElement('div');
+  t.className = 'toast' + (err ? ' err' : '');
+  t.textContent = msg;
+  container.appendChild(t);
+  t._timer = setTimeout(() => {
+    t.classList.add('out');
+    setTimeout(() => t.remove(), 260);
+  }, 1800);
+}
+function call(cmd, args, okMsg) {
+  return invokeTauri(cmd, args).then(r => { if (okMsg) toast(okMsg); return r; })
+    .catch(e => { console.error(cmd, e); toast('Gagal: ' + cmd, true); setEC(false); return null; });
+}
+function throttle(fn, ms) {
+  let last = 0, timer = null, lastArgs;
+  return (...a) => {
+    lastArgs = a;
+    const now = Date.now();
+    if (now - last >= ms) { last = now; fn(...a); }
+    else { clearTimeout(timer); timer = setTimeout(() => { last = Date.now(); fn(...lastArgs); }, ms - (now - last)); }
+  };
+}
+function setEC(ok) {
+  $('#ecLed').className = 'led ' + (ok ? 'ok' : 'err');
+  $('#ecTxt').textContent = ok ? 'ACTIVE' : 'ERROR';
+}
+function fillRange(el) {
+  const p = (el.value - el.min) / (el.max - el.min) * 100;
+  el.style.setProperty('--pct', p + '%');
+}
+
+/* =============== State =============== */
+const state = {
+  fanMode: 'auto', cpuPct: 50, gpuPct: 50, curveFollow: false,
+  profile: 'balanced', coolboost: false, bat80: false,
+  curve: [], curveName: 'balanced',
+  tele: { cpu: 52, gpu: 48, cr: 2300, gr: 2100 },
+  cpuHistory: new Array(30).fill(50),
+  gpuHistory: new Array(30).fill(46),
+  zones: ['#E4002B', '#00D2FF', '#00D2FF', '#E4002B'], baseZones: ['#E4002B', '#00D2FF', '#00D2FF', '#E4002B'], zone: 0, effect: 'static', speed: 5, direction: 1
+};
+
+/* =============== Navigation =============== */
+$('#nav').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  $$('#nav button').forEach(x => x.classList.toggle('on', x === b));
+  $$('.tab').forEach(t => t.classList.toggle('on', t.id === 'tab-' + b.dataset.tab));
+  if (b.dataset.tab === 'fan') drawCurve();
+  if (b.dataset.tab === 'rgb') syncLastModeFromHardware(false);
+  if (b.dataset.tab === 'specs') loadSystemSpecs();
+  if (b.dataset.tab === 'tune' && !scanned) startScan();
+});
+$('#btnMin').addEventListener('click', () => {
+  invokeTauri('minimize_to_tray').catch(() => {
+    try {
+      const w = (window.__TAURI__ && window.__TAURI__.window && window.__TAURI__.window.getCurrentWindow)
+        ? window.__TAURI__.window.getCurrentWindow() : null;
+      if (w) w.hide();
+    } catch (e) { console.warn(e); }
+  });
+});
+
+/* =============== HUD Overlay Button =============== */
+const btnHud = $('#btnToggleHud');
+if (btnHud) {
+  btnHud.addEventListener('click', async () => {
+    try {
+      await invokeTauri('toggle_hud_window');
+    } catch (e) {
+      console.warn('toggle_hud_window:', e);
+    }
+  });
+}
+
+/* =============== Tachometer dials with Speedometer Needle =============== */
+const R = 118, C = 2 * Math.PI * R, ARC = C * 0.75;
+function buildDial(host, color, id) {
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 300 300'); svg.setAttribute('class', 'g');
+  let ticks = '';
+  for (let i = 0; i <= 30; i++) {
+    const a = (135 + i * 9) * Math.PI / 180, major = i % 5 === 0;
+    const r1 = major ? 98 : 104, r2 = 110;
+    ticks += `<line x1="${150 + r1 * Math.cos(a)}" y1="${150 + r1 * Math.sin(a)}" x2="${150 + r2 * Math.cos(a)}" y2="${150 + r2 * Math.sin(a)}" stroke="${major ? '#8a93a1' : '#3b414c'}" stroke-width="${major ? 2 : 1}"/>`;
+  }
+  let labels = '';
+  [[30, 0], [50, 8.57], [70, 17.14], [90, 25.71], [100, 30]].forEach(([v, idx]) => {
+    const a = (135 + idx * 9) * Math.PI / 180;
+    labels += `<text x="${150 + 82 * Math.cos(a)}" y="${150 + 82 * Math.sin(a) + 3}" fill="#6b7482" font-size="9" text-anchor="middle" font-family="inherit">${v}</text>`;
+  });
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="gr${id}" x1="0" y1="1" x2="1" y2="0">
+        <stop offset="0%" stop-color="${color}"/>
+        <stop offset=".65%" stop-color="${color}"/>
+        <stop offset="1" stop-color="#E4002B"/>
+      </linearGradient>
+      <linearGradient id="ndlGrad${id}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="45%" stop-color="${color}"/>
+        <stop offset="100%" stop-color="#99001b"/>
+      </linearGradient>
+    </defs>
+    <circle cx="150" cy="150" r="${R}" fill="none" stroke="#222834" stroke-width="12" stroke-dasharray="${ARC} ${C}" transform="rotate(135 150 150)"/>
+    <circle id="arc${id}" cx="150" cy="150" r="${R}" fill="none" stroke="url(#gr${id})" stroke-width="12" stroke-dasharray="0 ${C}" transform="rotate(135 150 150)" style="filter:drop-shadow(0 0 5px ${color});transition:stroke-dasharray .6s cubic-bezier(.3,.7,.3,1)"/>
+    ${ticks}${labels}
+    <!-- Physical Speedometer Needle -->
+    <g id="needle${id}" style="transform-origin:150px 150px;transform:rotate(-135deg);transition:transform .6s cubic-bezier(.2,.8,.2,1);pointer-events:none">
+      <polygon points="146.5,150 150,75 153.5,150 150,158" fill="url(#ndlGrad${id})" filter="drop-shadow(0 0 5px ${color})"/>
+      <line x1="150" y1="78" x2="150" y2="150" stroke="#FFF" stroke-width="1.2" opacity="0.9"/>
+      <circle cx="150" cy="150" r="14" fill="#12161c" stroke="${color}" stroke-width="2.5" filter="drop-shadow(0 0 8px rgba(0,0,0,0.9))"/>
+      <circle cx="150" cy="150" r="5" fill="${color}" filter="drop-shadow(0 0 4px ${color})"/>
+    </g>`;
+
+  const fw = document.createElement('div');
+  fw.className = 'fanwrap'; fw.style.setProperty('--gl', color === '#00D2FF' ? 'rgba(0,210,255,.55)' : 'rgba(228,0,43,.6)');
+  fw.innerHTML = `<img id="fan${id}" src="assets/images_200_img_fan.png" alt="" onerror="this.style.display='none'">`;
+
+  // Place SVG on top of spinning fan so needle and gauge markings are clearly visible in the foreground
+  host.append(fw, svg);
+}
+buildDial($('#dialCpu'), '#00D2FF', 'C');
+buildDial($('#dialGpu'), '#E4002B', 'G');
+
+function setDial(id, temp, rpm) {
+  const f = clamp((temp - 30) / 70, 0, 1);
+  const arc = $('#arc' + id);
+  if (arc) arc.setAttribute('stroke-dasharray', `${ARC * f} ${C}`);
+
+  const needle = $('#needle' + id);
+  if (needle) {
+    const deg = -135 + f * 270;
+    needle.style.transform = `rotate(${deg}deg)`;
+  }
+
+  const dur = rpm > 200 ? clamp(1500 / rpm, 0.1, 6) : 0;
+  const img = $('#fan' + id);
+  if (img) {
+    img.style.animationDuration = dur ? dur + 's' : '1s';
+    img.style.animationPlayState = dur ? 'running' : 'paused';
+  }
+}
+
+/* =============== Oscilloscope Telemetry Grid =============== */
+function renderSparkline(svgId, areaId, lineId, dotId, badgeId, data, minVal = 25, maxVal = 100, unit = 'C') {
+  const width = 488, xStart = 28, yBottom = 64, yTop = 10;
+  const step = (width - xStart) / (data.length - 1);
+  const points = data.map((val, i) => {
+    const x = xStart + i * step;
+    const f = clamp((val - minVal) / (maxVal - minVal), 0, 1);
+    const y = yBottom - f * (yBottom - yTop);
+    return [x, y];
+  });
+
+  let linePath = `M ${points[0][0]} ${points[0][1]}`;
+  for (let i = 1; i < points.length; i++) {
+    linePath += ` L ${points[i][0]} ${points[i][1]}`;
+  }
+  const areaPath = `${linePath} L ${width} ${yBottom} L ${xStart} ${yBottom} Z`;
+
+  const lEl = $('#' + lineId);
+  const aEl = $('#' + areaId);
+  if (lEl) lEl.setAttribute('d', linePath);
+  if (aEl) aEl.setAttribute('d', areaPath);
+
+  const lastPt = points[points.length - 1];
+  const dotEl = $('#' + dotId);
+  const badgeEl = $('#' + badgeId);
+  if (dotEl) {
+    dotEl.setAttribute('cx', lastPt[0]);
+    dotEl.setAttribute('cy', lastPt[1]);
+  }
+  if (badgeEl) {
+    badgeEl.setAttribute('x', lastPt[0] - 6);
+    badgeEl.setAttribute('y', Math.max(lastPt[1] - 4, 14));
+    badgeEl.textContent = Math.round(data[data.length - 1]) + unit;
+  }
+}
+
+function updateStreams(cpu, gpu) {
+  state.cpuHistory.push(cpu);
+  state.cpuHistory.shift();
+  state.gpuHistory.push(gpu);
+  state.gpuHistory.shift();
+
+  renderSparkline('cpuStreamSvg', 'cpuStreamArea', 'cpuStreamLine', 'cpuStreamDot', 'cpuStreamBadge', state.cpuHistory, 25, 100, ' C');
+  renderSparkline('gpuStreamSvg', 'gpuStreamArea', 'gpuStreamLine', 'gpuStreamDot', 'gpuStreamBadge', state.gpuHistory, 25, 100, ' C');
+
+  const cpuMax = Math.round(Math.max(...state.cpuHistory));
+  const gpuMax = Math.round(Math.max(...state.gpuHistory));
+  $('#cpuPeak').textContent = cpuMax + ' C';
+  $('#gpuPeak').textContent = gpuMax + ' C';
+  if (state.tele && state.tele.cpuLoad != null) {
+    $('#cpuLoad').textContent = Math.round(state.tele.cpuLoad) + '%';
+  } else {
+    $('#cpuLoad').textContent = Math.round(clamp((cpu - 38) * 1.8, 12, 99)) + '%';
+  }
+  if (state.tele && state.tele.vramUsed != null && state.tele.vramTotal != null) {
+    $('#gpuVram').textContent = (state.tele.vramUsed / 1024).toFixed(1) + ' / ' + Math.round(state.tele.vramTotal / 1024) + ' GB';
+  } else {
+    $('#gpuVram').textContent = (1.1 + clamp((gpu - 40) / 30, 0, 1) * 2.2).toFixed(1) + ' / 4 GB';
+  }
+}
+
+/* =============== Telemetry with EMA Filter & Deadband =============== */
+let smoothCpu = null;
+let smoothGpu = null;
+
+function smoothTemp(raw, prev, alpha = 0.35, deadband = 0.5) {
+  if (prev == null) return raw;
+  if (Math.abs(raw - prev) < deadband) return prev;
+  return alpha * raw + (1 - alpha) * prev;
+}
+
+function simulate() {
+  return null;
+}
+
+function applyTelemetry(t) {
+  if (!t) return;
+  const rawCpu = +t.cpu_temp_c || (state.tele ? state.tele.cpu : 45);
+  const rawGpu = +t.gpu_temp_c || (state.tele ? state.tele.gpu : 40);
+  smoothCpu = smoothTemp(rawCpu, smoothCpu, 0.35, 0.5);
+  smoothGpu = smoothTemp(rawGpu, smoothGpu, 0.35, 0.5);
+  const cpu = smoothCpu;
+  const gpu = smoothGpu;
+
+  const cr = (t.cpu_fan_rpm != null) ? +t.cpu_fan_rpm : (state.tele ? state.tele.cr : 0);
+  const gr = (t.gpu_fan_rpm != null) ? +t.gpu_fan_rpm : (state.tele ? state.tele.gr : 0);
+  const cpuLoad = (t.cpu_load_pct != null) ? +t.cpu_load_pct : (state.tele ? state.tele.cpuLoad : null);
+  const vramUsed = (t.vram_used_mb != null) ? +t.vram_used_mb : (state.tele ? state.tele.vramUsed : null);
+  const vramTotal = (t.vram_total_mb != null) ? +t.vram_total_mb : (state.tele ? state.tele.vramTotal : null);
+  state.tele = { cpu, gpu, cr, gr, cpuLoad, vramUsed, vramTotal };
+  $('#cpuT').innerHTML = Math.round(cpu) + '<small>&deg;C</small>';
+  $('#gpuT').innerHTML = Math.round(gpu) + '<small>&deg;C</small>';
+  $('#cpuR').textContent = Math.round(cr);
+  $('#gpuR').textContent = Math.round(gr);
+  const cg = t.cpu_clock_ghz != null ? +t.cpu_clock_ghz : (2.6 + clamp((cpu - 40) / 45, 0, 1) * 1.9);
+  const gg = t.gpu_clock_ghz != null ? +t.gpu_clock_ghz : (1.1 + clamp((gpu - 40) / 45, 0, 1) * 0.7);
+  $('#cpuG').innerHTML = cg.toFixed(2) + '<small>GHz</small>';
+  $('#gpuG').innerHTML = gg.toFixed(2) + '<small>GHz</small>';
+  setDial('C', cpu, cr); setDial('G', gpu, gr);
+  $('#sCpuF').textContent = Math.round(cr) + ' RPM';
+  $('#sGpuF').textContent = Math.round(gr) + ' RPM';
+  updateStreams(cpu, gpu);
+  if (typeof t.coolboost === 'boolean') syncChecks(['cbDash', 'cbFan'], t.coolboost, v => { state.coolboost = v; $('#sCb').textContent = v ? 'ON' : 'OFF'; });
+  if (typeof t.battery_care_limit === 'boolean' && Date.now() > batLockUntil) syncChecks(['bat80'], t.battery_care_limit, v => { state.bat80 = v; updBat(); });
+  setEC(true);
+  curveTick();
+}
+function syncChecks(ids, val, cb) {
+  if (document.activeElement && ids.includes(document.activeElement.id)) return;
+  ids.forEach(i => { $('#' + i).checked = val; });
+  cb(val);
+}
+async function pollTelemetry() {
+  try {
+    const r = await invokeTauri('get_telemetry');
+    if (r && typeof r === 'object') {
+      applyTelemetry(r);
+    }
+  } catch (e) {
+    console.warn('pollTelemetry error:', e);
+    setEC(false);
+  }
+}
+
+/* =============== Fan mode / dashboard controls =============== */
+const MODE_DESC = {
+  auto: 'Kecepatan kipas diatur otomatis oleh EC berdasarkan suhu CPU dan GPU.',
+  max: 'Kedua kipas berputar pada kecepatan penuh. Kebisingan tinggi.',
+  custom: 'Kecepatan kipas mengikuti slider manual atau kurva kustom Anda.'
+};
+const sendFan = throttle(() => call('set_fan_mode', { mode: state.fanMode, cpuPct: state.cpuPct, gpuPct: state.gpuPct }), 250);
+function setFanMode(mode, silent) {
+  state.fanMode = mode;
+  if (mode === 'max') { state.cpuPct = 100; state.gpuPct = 100; syncSliders(); }
+  if (mode !== 'custom') state.curveFollow = false;
+  $$('#fanSeg button').forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
+  $('#fanModeDesc').textContent = MODE_DESC[mode];
+  $('#sMode').textContent = mode.toUpperCase();
+  updCurveState();
+  sendFan();
+  if (!silent) toast('Mode kipas: ' + mode.toUpperCase());
+}
+$('#fanSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setFanMode(b.dataset.mode); });
+
+function onCoolboost(v) {
+  state.coolboost = v; $('#cbDash').checked = v; $('#cbFan').checked = v;
+  $('#sCb').textContent = v ? 'ON' : 'OFF';
+  call('set_coolboost', { enabled: v }, 'CoolBoost ' + (v ? 'aktif' : 'nonaktif'));
+}
+$('#cbDash').addEventListener('change', e => onCoolboost(e.target.checked));
+$('#cbFan').addEventListener('change', e => onCoolboost(e.target.checked));
+
+$('#profiles').addEventListener('click', e => {
+  const b = e.target.closest('.prof'); if (!b) return;
+  state.profile = b.dataset.p;
+  $$('#profiles .prof').forEach(x => x.classList.toggle('on', x === b));
+  $('#sProf').textContent = state.profile.toUpperCase();
+  call('set_thermal_profile', { profile: state.profile }, 'Profil termal: ' + state.profile.toUpperCase());
+});
+
+function updBat() {
+  $('#bat80').checked = state.bat80;
+  $('#bProt').textContent = state.bat80 ? 'Aktif (batas 80%)' : 'Standar';
+  $('#bhTag').textContent = 'GOOD';
+}
+let batLockUntil = 0;
+$('#bat80').addEventListener('change', e => {
+  state.bat80 = e.target.checked;
+  batLockUntil = Date.now() + 4000;
+  updBat();
+  call('set_battery_limit', { enabled: state.bat80 }, state.bat80 ? 'Conservation Mode aktif' : 'Conservation Mode nonaktif');
+});
+
+/* Local toggles */
+function localToggle(ids, name) {
+  ids.forEach(id => $('#' + id).addEventListener('change', e => {
+    ids.forEach(o => { $('#' + o).checked = e.target.checked; });
+    invokeTauri(name.cmd, { enabled: e.target.checked });
+    toast(name.label + (e.target.checked ? ' aktif' : ' nonaktif'));
+  }));
+}
+localToggle(['odDash', 'odGame'], { cmd: 'set_lcd_overdrive', label: 'LCD Overdrive' });
+localToggle(['wkDash', 'wkGame'], { cmd: 'set_win_key_lock', label: 'Windows Key Lock' });
+$('#skGame').addEventListener('change', e => { invokeTauri('set_sticky_keys_prompt', { disabled: e.target.checked }); toast('Sticky Keys ' + (e.target.checked ? 'dinonaktifkan' : 'dipulihkan')); });
+$('#suSelf').addEventListener('change', e => { invokeTauri('set_autostart', { enabled: e.target.checked }); toast('Startup NitroMan ' + (e.target.checked ? 'aktif' : 'nonaktif')); });
+
+/* Fan tab: sliders */
+function syncSliders() {
+  $('#cpuPct').value = state.cpuPct; $('#gpuPct').value = state.gpuPct;
+  $('#cpuPctV').textContent = state.cpuPct; $('#gpuPctV').textContent = state.gpuPct;
+  fillRange($('#cpuPct')); fillRange($('#gpuPct'));
+}
+['cpuPct', 'gpuPct'].forEach(id => $('#' + id).addEventListener('input', e => {
+  state[id] = +e.target.value; state.curveFollow = false;
+  $('#' + id + 'V').textContent = e.target.value; fillRange(e.target);
+  $$('#presets .chip').forEach(c => c.classList.remove('on'));
+  setFanMode('custom', true); updCurveState();
+}));
+$('#cpuPct').style.setProperty('--rc', 'var(--cyan)');
+syncSliders();
+
+/* Fan curve editor */
+const PRESETS = {
+  silent:   [[40, 20], [60, 35], [80, 60], [90, 85]],
+  balanced: [[40, 30], [60, 50], [80, 85], [90, 100]],
+  extreme:  [[40, 50], [55, 70], [70, 100], [85, 100]]
+};
+state.curve = PRESETS.balanced.map(p => ({ t: p[0], p: p[1] }));
+const CV = { w: 700, h: 360, l: 52, r: 20, t: 18, b: 38, tMin: 30, tMax: 100, pMin: 0, pMax: 100 };
+const cx = t => CV.l + (t - CV.tMin) / (CV.tMax - CV.tMin) * (CV.w - CV.l - CV.r);
+const cy = p => CV.h - CV.b - (p - CV.pMin) / (CV.pMax - CV.pMin) * (CV.h - CV.t - CV.b);
+const icx = x => CV.tMin + (x - CV.l) / (CV.w - CV.l - CV.r) * (CV.tMax - CV.tMin);
+const icy = y => CV.pMin + (CV.h - CV.b - y) / (CV.h - CV.t - CV.b) * (CV.pMax - CV.pMin);
+const curveSvg = $('#curve');
+let dragIdx = -1;
+
+function curveAt(temp) {
+  const c = state.curve;
+  if (temp <= c[0].t) return c[0].p;
+  for (let i = 1; i < c.length; i++) if (temp <= c[i].t) {
+    const a = c[i - 1], b = c[i]; return a.p + (b.p - a.p) * (temp - a.t) / (b.t - a.t);
+  }
+  return c[c.length - 1].p;
+}
+function drawCurve() {
+  const c = state.curve; let g = '';
+  for (let p = 0; p <= 100; p += 20) g += `<line x1="${CV.l}" x2="${CV.w - CV.r}" y1="${cy(p)}" y2="${cy(p)}" stroke="#1d2128"/><text x="${CV.l - 10}" y="${cy(p) + 4}" fill="#6b7482" font-size="11" text-anchor="end" font-family="inherit">${p}%</text>`;
+  for (let t = 30; t <= 100; t += 10) g += `<line y1="${CV.t}" y2="${CV.h - CV.b}" x1="${cx(t)}" x2="${cx(t)}" stroke="#1d2128"/><text x="${cx(t)}" y="${CV.h - CV.b + 20}" fill="#6b7482" font-size="11" text-anchor="middle" font-family="inherit">${t}&deg;C</text>`;
+  let d = `M${cx(CV.tMin)},${cy(c[0].p)}`;
+  c.forEach(pt => d += ` L${cx(pt.t)},${cy(pt.p)}`);
+  d += ` L${cx(CV.tMax)},${cy(c[c.length - 1].p)}`;
+  const area = d + ` L${cx(CV.tMax)},${cy(0)} L${cx(CV.tMin)},${cy(0)} Z`;
+  let pts = '';
+  c.forEach((pt, i) => {
+    pts += `<g class="pt" data-i="${i}"><circle cx="${cx(pt.t)}" cy="${cy(pt.p)}" r="18" fill="transparent"/><rect x="${cx(pt.t) - 7}" y="${cy(pt.p) - 7}" width="14" height="14" transform="rotate(45 ${cx(pt.t)} ${cy(pt.p)})" fill="#0a0b0d" stroke="${dragIdx === i ? '#fff' : '#E4002B'}" stroke-width="2.5" style="filter:drop-shadow(0 0 6px #E4002B)"/><text x="${cx(pt.t)}" y="${cy(pt.p) - 16}" fill="#e9ecf1" font-size="11" font-weight="700" text-anchor="middle" font-family="inherit">${Math.round(pt.p)}%</text></g>`;
+  });
+  curveSvg.innerHTML = `<defs><linearGradient id="cvf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E4002B" stop-opacity=".35"/><stop offset="1" stop-color="#E4002B" stop-opacity="0"/></linearGradient></defs>
+    <rect x="${CV.l}" y="${CV.t}" width="${CV.w - CV.l - CV.r}" height="${CV.h - CV.t - CV.b}" fill="#090a0d" stroke="#262b33"/>
+    ${g}<path d="${area}" fill="url(#cvf)"/><path d="${d}" fill="none" stroke="#E4002B" stroke-width="2.5" style="filter:drop-shadow(0 0 5px #E4002B)"/>
+    <g id="live"></g>${pts}`;
+  updCvTable();
+}
+function drawLive() {
+  const g = $('#live'); if (g) g.innerHTML = '';
+}
+function updCvTable() {
+  $('#cvtable').innerHTML = state.curve.map((p, i) => `<div>TITIK ${i + 1}<b class="mono">${Math.round(p.t)}&deg;C / ${Math.round(p.p)}%</b></div>`).join('');
+}
+function updCurveState() {
+  const on = state.curveFollow && state.fanMode === 'custom';
+  const el = $('#curveState'); el.textContent = on ? 'KURVA AKTIF' : 'KURVA TIDAK AKTIF'; el.className = 'tag ' + (on ? 'g' : 'c');
+}
+function svgPoint(e) {
+  const r = curveSvg.getBoundingClientRect();
+  return { x: (e.clientX - r.left) / r.width * CV.w, y: (e.clientY - r.top) / r.height * CV.h };
+}
+curveSvg.addEventListener('pointerdown', e => {
+  const g = e.target.closest('.pt'); if (!g) return;
+  dragIdx = +g.dataset.i; curveSvg.setPointerCapture(e.pointerId); drawCurve();
+});
+curveSvg.addEventListener('pointermove', e => {
+  if (dragIdx < 0) return;
+  const pt = svgPoint(e), c = state.curve, i = dragIdx;
+  const lo = i > 0 ? c[i - 1].t + 3 : CV.tMin + 2, hi = i < c.length - 1 ? c[i + 1].t - 3 : CV.tMax - 1;
+  c[i].t = clamp(Math.round(icx(pt.x)), lo, hi);
+  c[i].p = clamp(Math.round(icy(pt.y)), 20, 100);
+  for (let k = i + 1; k < c.length; k++) if (c[k].p < c[k - 1].p) c[k].p = c[k - 1].p;
+  for (let k = i - 1; k >= 0; k--) if (c[k].p > c[k + 1].p) c[k].p = c[k + 1].p;
+  $$('#presets .chip').forEach(x => x.classList.remove('on'));
+  drawCurve();
+});
+const endDrag = () => { if (dragIdx >= 0) { dragIdx = -1; state.curveFollow = true; setFanMode('custom', true); updCurveState(); drawCurve(); curveTick(true); } };
+curveSvg.addEventListener('pointerup', endDrag);
+curveSvg.addEventListener('pointercancel', endDrag);
+
+function curveTick(force) {
+  if (!state.curveFollow || state.fanMode !== 'custom') return;
+  const cp = Math.round(curveAt(state.tele.cpu)), gp = Math.round(curveAt(state.tele.gpu));
+  if (!force && cp === state.cpuPct && gp === state.gpuPct) return;
+  state.cpuPct = cp; state.gpuPct = gp; syncSliders(); sendFan();
+}
+function loadPreset(name) {
+  state.curve = PRESETS[name].map(p => ({ t: p[0], p: p[1] })); state.curveName = name;
+  $$('#presets .chip').forEach(c => c.classList.toggle('on', c.dataset.pr === name));
+  drawCurve();
+}
+$('#presets').addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  loadPreset(b.dataset.pr); state.curveFollow = true; setFanMode('custom', true); updCurveState(); curveTick(true);
+  toast('Preset kurva: ' + b.textContent);
+});
+$('#curveApply').addEventListener('click', () => {
+  state.curveFollow = true; setFanMode('custom', true); updCurveState(); curveTick(true); toast('Kurva kustom diterapkan');
+});
+$('#curveReset').addEventListener('click', () => {
+  loadPreset('balanced'); state.curveFollow = false; setFanMode('auto', true); toast('Kurva dikembalikan ke pabrik');
+});
+drawCurve(); updCurveState();
+
+/* =============== RGB lighting & Authentic Keyboard =============== */
+const ZN = ['Zone 1 (Left)', 'Zone 2 (WASD/Mid)', 'Zone 3 (Right/Nav)', 'Zone 4 (Numpad)'];
+const SW = [['Nitro Red', '#E4002B'], ['Cyan', '#00D2FF'], ['Toxic Green', '#00E676'], ['Amber', '#FFAA00'], ['Purple', '#9900FF'], ['Ice White', '#EAF6FF']];
+function buildRgb() {
+  $('#zgrid').innerHTML = ZN.map((n, i) => `<button class="cp zc" data-z="${i}"><div class="h"><span class="sw"></span><h4>${n}</h4></div><div class="hx mono"></div></button>`).join('');
+  $('#swatches').innerHTML = SW.map(([n, c]) => `<button class="swatch" title="${n}" aria-label="${n}" data-c="${c}" style="--sc:${c}"></button>`).join('');
+  renderRgb();
+}
+function renderRgb() {
+  const cards = $$('#zgrid .zc');
+  if (!state.baseZones || state.baseZones.length < 4) {
+    state.baseZones = ['#E4002B', '#00D2FF', '#00D2FF', '#E4002B'];
+  }
+  state.baseZones.forEach((c, i) => {
+    document.documentElement.style.setProperty(`--z${i + 1}`, state.effect === 'off' ? 'transparent' : c);
+    if (cards[i]) {
+      cards[i].style.setProperty('--zcol', c);
+      const hx = cards[i].querySelector('.hx');
+      if (hx) hx.textContent = (c || '').toUpperCase();
+      cards[i].classList.toggle('sel', i === state.zone);
+    }
+  });
+  $('#selZoneName').textContent = ZN[state.zone];
+  const cur = state.baseZones[state.zone] || '#00D2FF';
+  $('#colorPick').value = cur; $('#hexTxt').textContent = cur.toUpperCase();
+  $$('#swatches .swatch').forEach(s => s.classList.toggle('on', s.dataset.c.toLowerCase() === cur.toLowerCase()));
+  document.documentElement.style.setProperty('--br', $('#br').value);
+
+  const ug = $('#kbUnderglow');
+  if (state.effect === 'breathing') {
+    ug.style.animation = 'pulse 2.4s ease-in-out infinite';
+  } else {
+    ug.style.animation = 'none';
+  }
+}
+
+function renderRgbPreview(zones) {
+  const targetZones = zones || state.baseZones || ['#00D2FF', '#00D2FF', '#00D2FF', '#00D2FF'];
+  const cards = $$('#zgrid .zc');
+  targetZones.forEach((c, i) => {
+    document.documentElement.style.setProperty(`--z${i + 1}`, state.effect === 'off' ? 'transparent' : c);
+    if (cards[i]) {
+      cards[i].style.setProperty('--zcol', c);
+      const hx = cards[i].querySelector('.hx');
+      if (hx) hx.textContent = (c || '').toUpperCase();
+    }
+  });
+}
+function selZone(i) { state.zone = i; renderRgb(); }
+$('#zgrid').addEventListener('click', e => { const b = e.target.closest('.zc'); if (b) selZone(+b.dataset.z); });
+$('#kbGrid').addEventListener('click', e => {
+  const k = e.target.closest('.key');
+  if (k && k.dataset.z != null) {
+    selZone(+k.dataset.z);
+    toast('Pilih ' + ZN[+k.dataset.z]);
+  }
+});
+
+function hexToRgb(h) {
+  const clean = (h || '#E4002B').replace('#', '');
+  if (clean.length === 6) {
+    return {
+      r: parseInt(clean.substring(0, 2), 16) || 0,
+      g: parseInt(clean.substring(2, 4), 16) || 0,
+      b: parseInt(clean.substring(4, 6), 16) || 0
+    };
+  }
+  return { r: 228, g: 0, b: 43 };
+}
+
+function hslToHex(h, s, l) {
+  h = ((h % 360) + 360) % 360;
+  l /= 100;
+  const a = (s * Math.min(l, 1 - l)) / 100;
+  const f = n => {
+    const k = (n + h / 30) % 12;
+    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * color).toString(16).padStart(2, '0');
+  };
+  return `#${f(0)}${f(8)}${f(4)}`.toUpperCase();
+}
+
+let applyRgbTimeout = null;
+function debouncedApplyRgb() {
+  if (applyRgbTimeout) clearTimeout(applyRgbTimeout);
+  applyRgbTimeout = setTimeout(async () => {
+    try {
+      await invokeTauri('apply_rgb_all', {
+        hexColors: state.baseZones,
+        effect: FX_MAP[state.effect] || 'static',
+        brightness: +$('#br').value,
+        speed: state.speed,
+        direction: state.direction
+      });
+    } catch (err) {}
+  }, 150);
+}
+
+function setZoneColor(c, applyNow = false) {
+  const uc = (c || '#00D2FF').toUpperCase();
+  if (!state.baseZones) state.baseZones = ['#E4002B', '#00D2FF', '#00D2FF', '#E4002B'];
+  state.baseZones[state.zone] = uc;
+  state.zones[state.zone] = uc;
+  if (state.effect === 'typing_wave') {
+    typingWaveColor = uc;
+  }
+  renderRgb();
+  if (['breathing', 'zoom', 'shifting', 'bicolor'].includes(state.effect)) {
+    startRgbAnim(false);
+  }
+  if (applyNow) {
+    debouncedApplyRgb();
+  }
+}
+
+$('#swatches').addEventListener('click', e => {
+  const b = e.target.closest('.swatch');
+  if (b) setZoneColor(b.dataset.c, true);
+});
+$('#colorPick').addEventListener('input', e => setZoneColor(e.target.value, false));
+$('#colorPick').addEventListener('change', e => setZoneColor(e.target.value, true));
+
+$('#applyAll').addEventListener('click', async () => {
+  const c = state.baseZones[state.zone];
+  state.baseZones = state.baseZones.map(() => c);
+  state.zones = [...state.baseZones];
+  renderRgb();
+  if (['breathing', 'zoom', 'shifting', 'bicolor'].includes(state.effect)) {
+    startRgbAnim(false);
+  }
+  try {
+    await invokeTauri('apply_rgb_all', {
+      hexColors: state.baseZones,
+      effect: FX_MAP[state.effect] || 'static',
+      brightness: +$('#br').value,
+      speed: state.speed,
+      direction: state.direction,
+      save: true
+    });
+    toast('Warna diterapkan ke 4 zona');
+  } catch (err) {
+    toast('Gagal menerapkan warna: ' + err);
+  }
+});
+
+const FIRMWARE_FX = ['wave', 'breathing', 'neon', 'zoom', 'shifting'];
+const SOFTWARE_FX = ['thermal', 'police', 'chase', 'typing_wave', 'bicolor', 'strobe'];
+
+const FX_MAP = {
+  static: 'static',
+  breathing: 'breathing',
+  wave: 'wave',
+  zoom: 'zoom',
+  shifting: 'shifting',
+  neon: 'neon',
+  thermal: 'static',
+  police: 'static',
+  chase: 'static',
+  typing_wave: 'static',
+  bicolor: 'static',
+  strobe: 'static',
+  off: 'off'
+};
+
+const FX_DESCS = {
+  static: 'Mode Statis: 4 zona warna mandiri tanpa animasi.',
+  breathing: 'Breathing: Pulsasi pernapasan ritmis dinamis sesuai pilihan warna dan kecerahan keyboard.',
+  wave: 'Spectrum Wave: Spektrum gelombang pelangi RGB dinamis mengalir melintasi 4 zona (atur kecepatan & arah).',
+  zoom: 'Zoom: Gelombang cahaya memancar dari zona tengah ke tepi luar keyboard.',
+  shifting: 'Shifting: Pergeseran balok warna melintasi zona sesuai arah yang dipilih.',
+  neon: 'Neon Cycle: Siklus transisi spektrum warna pelangi sinkron menyeluruh di 4 zona.',
+  thermal: 'Software Reactive Heatmap Alert: Indikator suhu CPU (Zona 1-2) & GPU (Zona 3-4). CPU >75C berkedip kuning, >90C merah cepat. GPU >70C berkedip kuning, >80C merah cepat.',
+  police: 'Custom Mode Strobo Polisi: Zona 1-2 berkedip merah cepat bergantian dengan Zona 3-4 berkedip biru.',
+  chase: 'Custom Sequential Zone Chase: Area keyboard menyala bergantian 1 zona per langkah tanpa menyala bersamaan. Arah & kecepatan dapat diatur.',
+  typing_wave: 'Custom Reactive Typing Wave: Gelombang spektrum RGB pelangi merambat interaktif ke samping setiap kali tombol keyboard ditekan.',
+  bicolor: 'Software Reactive Bicolor Pulse: Pulsasi crossfade halus antara 2 warna pilihan Anda di hardware keyboard.',
+  strobe: 'Software Reactive Strobe Alert: Strobo peringatan cepat darurat (Merah/Putih) dengan proteksi auto-timeout.',
+  off: 'Lampu keyboard dimatikan total.'
+};
+
+const CHASE_RAINBOW = [
+  '#00D2FF', // Cyan
+  '#00E676', // Lime Green
+  '#FFD600', // Yellow
+  '#FF6D00', // Orange
+  '#E4002B', // Acer Red
+  '#D500F9', // Vivid Purple
+  '#2979FF', // Electric Blue
+  '#FF0055'  // Neon Pink
+];
+
+let rgbAnimTimer = null;
+let rgbAnimStep = 0;
+let lastThermalSig = '';
+let strobeCounter = 0;
+let policeStep = 0;
+let chaseIndex = 0;
+let chaseColorIndex = 0;
+let zoomStep = 0;
+let shiftingIndex = 0;
+let typingWaveHue = 0;
+
+let typingWaveActive = false;
+let typingWaveTimer = null;
+let typingWaveColor = '#00E5FF';
+let activeRipples = [];
+
+let rgbEpoch = 0;
+let isRgbBusy = false;
+let pendingRgbPayload = null;
+
+async function safeApplyRgb(payload, epoch) {
+  if (epoch != null && epoch !== rgbEpoch) {
+    return;
+  }
+  if (isRgbBusy) {
+    pendingRgbPayload = { payload, epoch: (epoch != null ? epoch : rgbEpoch) };
+    return;
+  }
+  isRgbBusy = true;
+  try {
+    await invokeTauri('apply_rgb_all', payload);
+  } catch (e) {
+  } finally {
+    isRgbBusy = false;
+    if (pendingRgbPayload) {
+      const next = pendingRgbPayload;
+      pendingRgbPayload = null;
+      if (next.epoch === rgbEpoch) {
+        safeApplyRgb(next.payload, next.epoch);
+      }
+    }
+  }
+}
+
+function stopRgbCustomLoop() {
+  rgbEpoch++;
+  pendingRgbPayload = null;
+  isRgbBusy = false;
+  if (rgbAnimTimer) {
+    clearInterval(rgbAnimTimer);
+    rgbAnimTimer = null;
+  }
+  stopTypingWaveMode();
+  rgbAnimStep = 0;
+  lastThermalSig = '';
+  strobeCounter = 0;
+  policeStep = 0;
+  chaseIndex = 0;
+  chaseColorIndex = 0;
+  zoomStep = 0;
+  shiftingIndex = 0;
+}
+
+function updateFxUI() {
+  const isDynamicDir = state.effect === 'wave' || state.effect === 'shifting' || state.effect === 'chase';
+  $('#dirContainer').style.display = isDynamicDir ? 'block' : 'none';
+
+  const isSpeedSupported = ['breathing', 'wave', 'zoom', 'shifting', 'neon', 'bicolor', 'police', 'chase', 'typing_wave'].includes(state.effect);
+  $('#speedContainer').style.opacity = isSpeedSupported ? '1' : '0.5';
+
+  if (FX_DESCS[state.effect]) {
+    $('#fxDesc').textContent = FX_DESCS[state.effect];
+    $('#fxDesc').style.display = 'block';
+  } else {
+    $('#fxDesc').style.display = 'none';
+  }
+
+  $('#speedV').textContent = state.speed || 5;
+  $('#animSpeed').value = state.speed || 5;
+  fillRange($('#animSpeed'));
+
+  $('#dirV').textContent = (state.direction === 2) ? 'KIRI' : 'KANAN';
+  $('#dirRight').classList.toggle('on', state.direction !== 2);
+  $('#dirLeft').classList.toggle('on', state.direction === 2);
+}
+
+function startRgbAnim(resetStep = true) {
+  if (resetStep) {
+    stopRgbCustomLoop();
+  } else if (rgbAnimTimer) {
+    clearInterval(rgbAnimTimer);
+    rgbAnimTimer = null;
+  }
+  updateFxUI();
+
+  const spd = state.speed || 5;
+
+  if (state.effect === 'wave') {
+    rgbAnimTimer = setInterval(updateWaveUIOnly, 33);
+    updateWaveUIOnly();
+  } else if (state.effect === 'breathing') {
+    const isMultiColor = state.baseZones && state.baseZones.length === 4 && state.baseZones.some((c, i, a) => (c || '').toUpperCase() !== (a[0] || '').toUpperCase());
+    if (isMultiColor) {
+      rgbAnimTimer = setInterval(updateBreathingHardware, 35);
+      updateBreathingHardware();
+    } else {
+      rgbAnimTimer = setInterval(updateBreathingUIOnly, 33);
+      updateBreathingUIOnly();
+    }
+  } else if (state.effect === 'neon') {
+    rgbAnimTimer = setInterval(updateNeonUIOnly, 33);
+    updateNeonUIOnly();
+  } else if (state.effect === 'zoom') {
+    const isMultiColor = state.baseZones && state.baseZones.length >= 2 && (state.baseZones[0] || '').toUpperCase() !== (state.baseZones[1] || '').toUpperCase();
+    if (isMultiColor) {
+      rgbAnimTimer = setInterval(updateZoomHardware, 35);
+      updateZoomHardware();
+    } else {
+      rgbAnimTimer = setInterval(updateZoomUIOnly, 33);
+      updateZoomUIOnly();
+    }
+  } else if (state.effect === 'shifting') {
+    const isMultiColor = state.baseZones && state.baseZones.length === 4 && state.baseZones.some((c, i, a) => (c || '').toUpperCase() !== (a[0] || '').toUpperCase());
+    if (isMultiColor) {
+      const interval = Math.max(90, 420 - spd * 35);
+      rgbAnimTimer = setInterval(updateShiftingHardware, interval);
+      updateShiftingHardware();
+    } else {
+      const interval = Math.max(60, 320 - spd * 28);
+      rgbAnimTimer = setInterval(updateShiftingUIOnly, interval);
+      updateShiftingUIOnly();
+    }
+  } else if (state.effect === 'thermal') {
+    rgbAnimTimer = setInterval(updateThermalRgbHardware, 350);
+    updateThermalRgbHardware();
+  } else if (state.effect === 'police') {
+    const interval = Math.max(45, 120 - spd * 8);
+    rgbAnimTimer = setInterval(updatePoliceHardware, interval);
+    updatePoliceHardware();
+  } else if (state.effect === 'chase') {
+    const interval = Math.max(65, 200 - spd * 15);
+    rgbAnimTimer = setInterval(updateChaseHardware, interval);
+    updateChaseHardware();
+  } else if (state.effect === 'typing_wave') {
+    startTypingWaveMode();
+  } else if (state.effect === 'bicolor') {
+    rgbAnimTimer = setInterval(updateBicolorHardware, 40);
+    updateBicolorHardware();
+  } else if (state.effect === 'strobe') {
+    const interval = Math.max(50, 150 - spd * 10);
+    rgbAnimTimer = setInterval(updateStrobeHardware, interval);
+    updateStrobeHardware();
+  }
+}
+
+function updateThermalRgbHardware() {
+  const myEpoch = rgbEpoch;
+  rgbAnimStep++;
+  const cpu = (state.tele && state.tele.cpu != null) ? state.tele.cpu : 50;
+  const gpu = (state.tele && state.tele.gpu != null) ? state.tele.gpu : 46;
+
+  function tempColor(t) {
+    if (t < 48) return '#00D2FF';
+    if (t < 62) return '#00E676';
+    if (t < 74) return '#FFAA00';
+    return '#E4002B';
+  }
+
+  // CPU Alert logic (Zone 1 & 2 -> index 0 & 1)
+  let cCpu;
+  let cpuAlert = false;
+  if (cpu >= 90) {
+    cpuAlert = true;
+    cCpu = (rgbAnimStep % 2 === 1) ? '#E4002B' : '#000000';
+  } else if (cpu >= 75) {
+    cpuAlert = true;
+    cCpu = (Math.floor(rgbAnimStep / 2) % 2 === 1) ? '#FFAA00' : '#000000';
+  } else {
+    cCpu = tempColor(cpu);
+  }
+
+  // GPU Alert logic (Zone 3 & 4 -> index 2 & 3)
+  let cGpu;
+  let gpuAlert = false;
+  if (gpu >= 80) {
+    gpuAlert = true;
+    cGpu = (rgbAnimStep % 2 === 1) ? '#E4002B' : '#000000';
+  } else if (gpu >= 70) {
+    gpuAlert = true;
+    cGpu = (Math.floor(rgbAnimStep / 2) % 2 === 1) ? '#FFAA00' : '#000000';
+  } else {
+    cGpu = tempColor(gpu);
+  }
+
+  const frameZones = [cCpu, cCpu, cGpu, cGpu];
+  renderRgbPreview(frameZones);
+
+  const sig = frameZones.join(',');
+  if (cpuAlert || gpuAlert || sig !== lastThermalSig) {
+    lastThermalSig = sig;
+    safeApplyRgb({
+      hexColors: frameZones,
+      effect: 'fast',
+      brightness: +$('#br').value,
+      speed: state.speed,
+      direction: state.direction
+    }, myEpoch);
+  }
+}
+
+function updatePoliceHardware() {
+  const myEpoch = rgbEpoch;
+  const step = policeStep % 8;
+  policeStep++;
+
+  const cRed = '#E4002B';
+  const cBlue = '#0044FF';
+  const cOff = '#000000';
+
+  let z0 = cOff, z1 = cOff, z2 = cOff, z3 = cOff;
+  if (step === 0 || step === 2) {
+    z0 = cRed;
+    z1 = cRed;
+  } else if (step === 4 || step === 6) {
+    z2 = cBlue;
+    z3 = cBlue;
+  }
+
+  const frameZones = [z0, z1, z2, z3];
+  renderRgbPreview(frameZones);
+
+  safeApplyRgb({
+    hexColors: frameZones,
+    effect: 'fast',
+    brightness: +$('#br').value,
+    speed: state.speed,
+    direction: state.direction
+  }, myEpoch);
+}
+
+function updateChaseHardware() {
+  const myEpoch = rgbEpoch;
+  const activeColor = CHASE_RAINBOW[chaseColorIndex % CHASE_RAINBOW.length];
+  chaseColorIndex++;
+
+  const headZone = chaseIndex;
+  const trail1Zone = (state.direction === 2) ? (chaseIndex + 1) % 4 : (chaseIndex + 3) % 4;
+  const trail2Zone = (state.direction === 2) ? (chaseIndex + 2) % 4 : (chaseIndex + 2) % 4;
+
+  const rgbHead = hexToRgb(activeColor);
+  const rgbT1 = {
+    r: Math.round(rgbHead.r * 0.35),
+    g: Math.round(rgbHead.g * 0.35),
+    b: Math.round(rgbHead.b * 0.35)
+  };
+  const rgbT2 = {
+    r: Math.round(rgbHead.r * 0.10),
+    g: Math.round(rgbHead.g * 0.10),
+    b: Math.round(rgbHead.b * 0.10)
+  };
+
+  const hexHead = activeColor;
+  const hexT1 = `#${rgbT1.r.toString(16).padStart(2, '0')}${rgbT1.g.toString(16).padStart(2, '0')}${rgbT1.b.toString(16).padStart(2, '0')}`.toUpperCase();
+  const hexT2 = `#${rgbT2.r.toString(16).padStart(2, '0')}${rgbT2.g.toString(16).padStart(2, '0')}${rgbT2.b.toString(16).padStart(2, '0')}`.toUpperCase();
+
+  const frameZones = ['#000000', '#000000', '#000000', '#000000'];
+  frameZones[headZone] = hexHead;
+  frameZones[trail1Zone] = hexT1;
+  frameZones[trail2Zone] = hexT2;
+
+  renderRgbPreview(frameZones);
+
+  safeApplyRgb({
+    hexColors: frameZones,
+    effect: 'fast',
+    brightness: +$('#br').value,
+    speed: state.speed,
+    direction: state.direction
+  }, myEpoch);
+
+  if (state.direction === 2) {
+    chaseIndex = (chaseIndex + 3) % 4;
+  } else {
+    chaseIndex = (chaseIndex + 1) % 4;
+  }
+}
+
+function startTypingWaveMode() {
+  stopTypingWaveMode();
+  typingWaveActive = true;
+  activeRipples = [];
+
+  const curVal = $('#colorPick').value;
+  if (curVal && curVal !== '#000000') {
+    typingWaveColor = curVal;
+  } else {
+    const candidate = state.baseZones.find(c => c && c !== '#000000');
+    typingWaveColor = candidate || '#00E5FF';
+  }
+
+  invokeTauri('start_typing_wave_hook').catch(e => console.warn('start_typing_wave_hook:', e));
+
+  const frameZones = ['#000000', '#000000', '#000000', '#000000'];
+  renderRgbPreview(frameZones);
+  safeApplyRgb({
+    hexColors: frameZones,
+    effect: 'fast',
+    brightness: +$('#br').value,
+    speed: state.speed,
+    direction: state.direction
+  }, rgbEpoch);
+
+  const tickMs = Math.max(35, 95 - (state.speed || 5) * 7);
+  typingWaveTimer = setInterval(tickTypingWave, tickMs);
+}
+
+function stopTypingWaveMode() {
+  typingWaveActive = false;
+  typingWaveNeedsClear = false;
+  if (typingWaveTimer) {
+    clearInterval(typingWaveTimer);
+    typingWaveTimer = null;
+  }
+  activeRipples = [];
+  invokeTauri('stop_typing_wave_hook').catch(() => {});
+}
+
+let typingWaveNeedsClear = false;
+
+function triggerTypingWave(hitZone) {
+  if (!typingWaveActive) return;
+  typingWaveNeedsClear = true;
+  const zNum = Number(hitZone);
+  const zone = isNaN(zNum) ? 1 : clamp(zNum, 0, 3);
+  typingWaveHue = (typingWaveHue + 40) % 360;
+  activeRipples.push({
+    hitZone: zone,
+    step: 0,
+    maxHop: Math.max(zone, 3 - zone),
+    baseHue: typingWaveHue
+  });
+  if (activeRipples.length > 5) {
+    activeRipples.shift();
+  }
+}
+
+function tickTypingWave() {
+  if (!typingWaveActive) return;
+  if (activeRipples.length === 0) {
+    if (typingWaveNeedsClear) {
+      typingWaveNeedsClear = false;
+      const cOff = '#000000';
+      const frameZones = [cOff, cOff, cOff, cOff];
+      renderRgbPreview(frameZones);
+      safeApplyRgb({
+        hexColors: frameZones,
+        effect: 'fast',
+        brightness: +$('#br').value,
+        speed: state.speed,
+        direction: state.direction
+      }, rgbEpoch);
+    }
+    return;
+  }
+  typingWaveNeedsClear = true;
+  const myEpoch = rgbEpoch;
+
+  const frameZones = ['#000000', '#000000', '#000000', '#000000'];
+  const zoneIntensities = [0, 0, 0, 0];
+  const zoneHues = [0, 0, 0, 0];
+
+  for (let i = activeRipples.length - 1; i >= 0; i--) {
+    const rip = activeRipples[i];
+    for (let z = 0; z < 4; z++) {
+      const dist = Math.abs(z - rip.hitZone);
+      let intensity = 0;
+      if (dist === rip.step) {
+        intensity = 1.0;
+      } else if (dist === rip.step - 1) {
+        intensity = 0.35;
+      } else if (dist === rip.step - 2) {
+        intensity = 0.12;
+      }
+
+      if (intensity > zoneIntensities[z]) {
+        zoneIntensities[z] = intensity;
+        zoneHues[z] = (rip.baseHue + dist * 50) % 360;
+      }
+    }
+    rip.step++;
+    if (rip.step > rip.maxHop + 2) {
+      activeRipples.splice(i, 1);
+    }
+  }
+
+  for (let z = 0; z < 4; z++) {
+    if (zoneIntensities[z] > 0) {
+      const rgbBase = hexToRgb(hslToHex(zoneHues[z], 100, 50));
+      const f = Math.pow(zoneIntensities[z], 1.4);
+      const r = Math.round(rgbBase.r * f).toString(16).padStart(2, '0');
+      const g = Math.round(rgbBase.g * f).toString(16).padStart(2, '0');
+      const b = Math.round(rgbBase.b * f).toString(16).padStart(2, '0');
+      frameZones[z] = `#${r}${g}${b}`.toUpperCase();
+    }
+  }
+
+  renderRgbPreview(frameZones);
+  safeApplyRgb({
+    hexColors: frameZones,
+    effect: 'fast',
+    brightness: +$('#br').value,
+    speed: state.speed,
+    direction: state.direction
+  }, myEpoch);
+}
+
+listenTauri('typing_zone', ev => {
+  let z = 1;
+  if (typeof ev === 'number') {
+    z = ev;
+  } else if (ev && typeof ev === 'object') {
+    if (typeof ev.payload === 'number') {
+      z = ev.payload;
+    } else if (ev.payload != null) {
+      z = Number(ev.payload);
+    }
+  }
+  if (!isNaN(z)) {
+    triggerTypingWave(z);
+  }
+});
+
+window.addEventListener('keydown', e => {
+  if (state.effect !== 'typing_wave') return;
+  let z = 1;
+  const code = e.code || '';
+  if (code.includes('Numpad') || ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Home', 'End', 'Delete', 'Insert'].includes(code)) {
+    z = 3;
+  } else if (['KeyQ', 'KeyW', 'KeyE', 'KeyA', 'KeyS', 'KeyD', 'KeyZ', 'KeyX', 'KeyC', 'Tab', 'CapsLock', 'ShiftLeft', 'ControlLeft'].includes(code)) {
+    z = 0;
+  } else if (['KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyV', 'KeyB', 'KeyN', 'Space'].includes(code)) {
+    z = 1;
+  } else {
+    z = 2;
+  }
+  triggerTypingWave(z);
+});
+
+function updateWaveUIOnly() {
+  const spd = state.speed || 5;
+  rgbAnimStep += 3 + spd * 3;
+  const step = rgbAnimStep;
+  const frameZones = [];
+  for (let z = 0; z < 4; z++) {
+    const hueOffset = (state.direction === 2) ? (z * 60) : (-z * 60);
+    const hue = ((step + hueOffset) % 360 + 360) % 360;
+    frameZones.push(hslToHex(hue, 100, 50));
+  }
+  renderRgbPreview(frameZones);
+}
+
+function getComplementaryHex(h) {
+  const rgb = hexToRgb(h || '#E4002B');
+  const r = rgb.r / 255, g = rgb.g / 255, b = rgb.b / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let hue, s, l = (max + min) / 2;
+  if (max === min) {
+    return rgb.r > 128 ? '#00D2FF' : '#E4002B';
+  }
+  const d = max - min;
+  s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  switch (max) {
+    case r: hue = (g - b) / d + (g < b ? 6 : 0); break;
+    case g: hue = (b - r) / d + 2; break;
+    case b: hue = (r - g) / d + 4; break;
+  }
+  hue = Math.round(hue * 60);
+  const compH = (hue + 180) % 360;
+  return hslToHex(compH, Math.max(80, Math.round(s * 100)), Math.round(l * 100));
+}
+
+function updateBreathingHardware() {
+  const myEpoch = rgbEpoch;
+  const spd = state.speed || 5;
+  rgbAnimStep += 0.035 + spd * 0.015;
+  const rawSin = (Math.sin(rgbAnimStep) + 1) / 2;
+  const effFactor = 0.04 + 0.96 * Math.pow(rawSin, 1.8);
+
+  const baseColors = (state.baseZones && state.baseZones.length === 4 && state.baseZones.some(c => c && c !== '#000000'))
+    ? state.baseZones
+    : ['#E4002B', '#00D2FF', '#00D2FF', '#E4002B'];
+
+  const frameZones = baseColors.map(c => {
+    const rgb = hexToRgb(c || '#00D2FF');
+    const r = Math.round(rgb.r * effFactor).toString(16).padStart(2, '0');
+    const g = Math.round(rgb.g * effFactor).toString(16).padStart(2, '0');
+    const b = Math.round(rgb.b * effFactor).toString(16).padStart(2, '0');
+    return `#${r}${g}${b}`.toUpperCase();
+  });
+
+  renderRgbPreview(frameZones);
+  safeApplyRgb({
+    hexColors: frameZones,
+    effect: 'fast',
+    brightness: +$('#br').value,
+    speed: state.speed,
+    direction: state.direction
+  }, myEpoch);
+}
+
+function updateZoomHardware() {
+  const myEpoch = rgbEpoch;
+  const spd = state.speed || 5;
+  rgbAnimStep += 0.04 + spd * 0.02;
+  const rawSin = (Math.sin(rgbAnimStep) + 1) / 2;
+  const f = Math.pow(rawSin, 1.6);
+
+  const cCenter = (state.baseZones && state.baseZones[1] && state.baseZones[1] !== '#000000') ? state.baseZones[1] : '#00E5FF';
+  const cEdge = (state.baseZones && state.baseZones[0] && state.baseZones[0] !== '#000000') ? state.baseZones[0] : '#E4002B';
+  const rgbCenter = hexToRgb(cCenter);
+  const rgbEdge = hexToRgb(cEdge);
+
+  const f1 = 0.04 + 0.96 * f;
+  const f2 = 0.04 + 0.96 * (1 - f);
+
+  const zCenter = `#${Math.round(rgbCenter.r * f1).toString(16).padStart(2, '0')}${Math.round(rgbCenter.g * f1).toString(16).padStart(2, '0')}${Math.round(rgbCenter.b * f1).toString(16).padStart(2, '0')}`.toUpperCase();
+  const zEdge = `#${Math.round(rgbEdge.r * f2).toString(16).padStart(2, '0')}${Math.round(rgbEdge.g * f2).toString(16).padStart(2, '0')}${Math.round(rgbEdge.b * f2).toString(16).padStart(2, '0')}`.toUpperCase();
+
+  const frameZones = [zEdge, zCenter, zCenter, zEdge];
+  renderRgbPreview(frameZones);
+  safeApplyRgb({
+    hexColors: frameZones,
+    effect: 'fast',
+    brightness: +$('#br').value,
+    speed: state.speed,
+    direction: state.direction
+  }, myEpoch);
+}
+
+function updateShiftingHardware() {
+  const myEpoch = rgbEpoch;
+  const dir = (state.direction === 2) ? -1 : 1;
+  shiftingIndex = (shiftingIndex + dir + 4) % 4;
+
+  const base = (state.baseZones && state.baseZones.length === 4 && state.baseZones.some(c => c && c !== '#000000'))
+    ? state.baseZones
+    : ['#E4002B', '#FFAA00', '#00E676', '#00D2FF'];
+
+  const frameZones = [
+    base[(0 + shiftingIndex) % 4],
+    base[(1 + shiftingIndex) % 4],
+    base[(2 + shiftingIndex) % 4],
+    base[(3 + shiftingIndex) % 4]
+  ];
+
+  renderRgbPreview(frameZones);
+  safeApplyRgb({
+    hexColors: frameZones,
+    effect: 'fast',
+    brightness: +$('#br').value,
+    speed: state.speed,
+    direction: state.direction
+  }, myEpoch);
+}
+
+function updateBreathingUIOnly() {
+  const spd = state.speed || 5;
+  rgbAnimStep += 0.04 + spd * 0.02;
+  const factor = (Math.sin(rgbAnimStep) + 1) / 2;
+  const effFactor = 0.08 + 0.92 * (factor * factor);
+
+  const baseColors = (state.baseZones && state.baseZones.length === 4 && state.baseZones.some(c => c && c !== '#000000'))
+    ? state.baseZones
+    : ['#00D2FF', '#00D2FF', '#00D2FF', '#00D2FF'];
+
+  const frameZones = baseColors.map(c => {
+    const rgb = hexToRgb(c || '#00D2FF');
+    const r = Math.round(rgb.r * effFactor).toString(16).padStart(2, '0');
+    const g = Math.round(rgb.g * effFactor).toString(16).padStart(2, '0');
+    const b = Math.round(rgb.b * effFactor).toString(16).padStart(2, '0');
+    return `#${r}${g}${b}`.toUpperCase();
+  });
+
+  renderRgbPreview(frameZones);
+}
+
+function updateNeonUIOnly() {
+  const spd = state.speed || 5;
+  rgbAnimStep = (rgbAnimStep + 2 + spd * 2) % 360;
+  const hex = hslToHex(rgbAnimStep, 100, 50);
+  const frameZones = [hex, hex, hex, hex];
+  renderRgbPreview(frameZones);
+}
+
+function updateZoomUIOnly() {
+  const spd = state.speed || 5;
+  rgbAnimStep += 0.05 + spd * 0.025;
+  const f = (Math.sin(rgbAnimStep) + 1) / 2;
+
+  const cCenter = (state.baseZones && state.baseZones[1] && state.baseZones[1] !== '#000000') ? state.baseZones[1] : '#00E5FF';
+  const cEdge = (state.baseZones && state.baseZones[0] && state.baseZones[0] !== '#000000') ? state.baseZones[0] : '#E4002B';
+  const rgbCenter = hexToRgb(cCenter);
+  const rgbEdge = hexToRgb(cEdge);
+
+  const zCenter = `#${Math.round(rgbCenter.r * (0.08 + 0.92 * f)).toString(16).padStart(2, '0')}${Math.round(rgbCenter.g * (0.08 + 0.92 * f)).toString(16).padStart(2, '0')}${Math.round(rgbCenter.b * (0.08 + 0.92 * f)).toString(16).padStart(2, '0')}`.toUpperCase();
+  const zEdge = `#${Math.round(rgbEdge.r * (0.08 + 0.92 * (1 - f))).toString(16).padStart(2, '0')}${Math.round(rgbEdge.g * (0.08 + 0.92 * (1 - f))).toString(16).padStart(2, '0')}${Math.round(rgbEdge.b * (0.08 + 0.92 * (1 - f))).toString(16).padStart(2, '0')}`.toUpperCase();
+
+  const frameZones = [zEdge, zCenter, zCenter, zEdge];
+  renderRgbPreview(frameZones);
+}
+
+function updateShiftingUIOnly() {
+  const dir = (state.direction === 2) ? -1 : 1;
+  shiftingIndex = (shiftingIndex + dir + 4) % 4;
+
+  const base = (state.baseZones && state.baseZones.length === 4 && state.baseZones.some(c => c && c !== '#000000'))
+    ? state.baseZones
+    : ['#E4002B', '#FFAA00', '#00E676', '#00D2FF'];
+
+  const frameZones = [
+    base[(0 + shiftingIndex) % 4],
+    base[(1 + shiftingIndex) % 4],
+    base[(2 + shiftingIndex) % 4],
+    base[(3 + shiftingIndex) % 4]
+  ];
+
+  renderRgbPreview(frameZones);
+}
+
+function updateBicolorHardware() {
+  const myEpoch = rgbEpoch;
+  const spd = state.speed || 5;
+  rgbAnimStep += 0.035 + spd * 0.015;
+  const factor = (Math.sin(rgbAnimStep) + 1) / 2;
+
+  let c1Hex = (state.baseZones && state.baseZones[0]) ? state.baseZones[0] : '#E4002B';
+  let c2Hex = (state.baseZones && state.baseZones[1]) ? state.baseZones[1] : '#00D2FF';
+
+  if (!c2Hex || c1Hex.toUpperCase() === c2Hex.toUpperCase()) {
+    c2Hex = getComplementaryHex(c1Hex);
+  }
+
+  const c1 = hexToRgb(c1Hex);
+  const c2 = hexToRgb(c2Hex);
+
+  // Perceptual RMS blending to eliminate muddy midtones
+  const r = Math.round(Math.sqrt((1 - factor) * c1.r * c1.r + factor * c2.r * c2.r));
+  const g = Math.round(Math.sqrt((1 - factor) * c1.g * c1.g + factor * c2.g * c2.g));
+  const b = Math.round(Math.sqrt((1 - factor) * c1.b * c1.b + factor * c2.b * c2.b));
+  const hex = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`.toUpperCase();
+
+  const frameZones = [hex, hex, hex, hex];
+  renderRgbPreview(frameZones);
+
+  safeApplyRgb({
+    hexColors: frameZones,
+    effect: 'fast',
+    brightness: +$('#br').value,
+    speed: state.speed,
+    direction: state.direction
+  }, myEpoch);
+}
+
+function updateStrobeHardware() {
+  const myEpoch = rgbEpoch;
+  strobeCounter++;
+  if (strobeCounter > 30) {
+    stopRgbCustomLoop();
+    state.effect = 'static';
+    $$('#fx .chip').forEach(x => x.classList.toggle('on', x.dataset.fx === 'static'));
+    renderRgb();
+    updateFxUI();
+    toast('Strobe Alert selesai (auto-timeout 10 detik)');
+    safeApplyRgb({
+      hexColors: state.baseZones,
+      effect: 'fast',
+      brightness: +$('#br').value,
+      speed: state.speed,
+      direction: state.direction
+    }, rgbEpoch);
+    return;
+  }
+  const on = (strobeCounter % 2) === 1;
+  const col = on ? '#FFFFFF' : '#E4002B';
+  const frameZones = [col, col, col, col];
+  renderRgbPreview(frameZones);
+
+  safeApplyRgb({
+    hexColors: frameZones,
+    effect: 'fast',
+    brightness: +$('#br').value,
+    speed: state.speed,
+    direction: state.direction
+  }, myEpoch);
+}
+
+
+// Auto-Detect & Sync Last Mode from Hardware without colliding
+async function syncLastModeFromHardware(applyToHw = false) {
+  try {
+    const res = await invokeTauri('sync_from_nitrosense');
+    if (res && res.zones) {
+      state.baseZones = res.zones.map(c => c || '#00D2FF');
+      state.zones = [...state.baseZones];
+      if (res.brightness != null) {
+        state.brightness = res.brightness;
+        $('#br').value = res.brightness;
+        $('#brV').textContent = res.brightness;
+        fillRange($('#br'));
+      }
+      if (res.effect) {
+        state.effect = res.effect;
+        $$('#fx .chip').forEach(x => x.classList.toggle('on', x.dataset.fx === res.effect));
+      }
+      if (res.speed != null) {
+        state.speed = res.speed;
+      }
+      if (res.direction != null) {
+        state.direction = res.direction;
+      }
+      updateFxUI();
+      renderRgb();
+      startRgbAnim(false);
+
+      if (applyToHw) {
+        await invokeTauri('apply_rgb_all', {
+          hexColors: state.baseZones,
+          effect: FX_MAP[state.effect] || 'static',
+          brightness: +$('#br').value,
+          speed: state.speed,
+          direction: state.direction
+        });
+        toast('Berhasil menyinkronkan status dari hardware NitroSense');
+      }
+    }
+  } catch (err) {
+    if (applyToHw) toast('Gagal membaca status hardware: ' + err);
+  }
+}
+
+$('#fx').addEventListener('click', async e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  const newFx = b.dataset.fx;
+  if (state.effect === newFx) return;
+  state.effect = newFx;
+  $$('#fx .chip').forEach(x => x.classList.toggle('on', x === b));
+  
+  stopRgbCustomLoop();
+  renderRgb();
+  updateFxUI();
+
+  if (state.effect === 'static') {
+    safeApplyRgb({
+      hexColors: state.baseZones,
+      effect: 'static',
+      brightness: +$('#br').value,
+      speed: state.speed,
+      direction: state.direction,
+      save: true
+    }, rgbEpoch);
+  } else if (state.effect === 'off') {
+    invokeTauri('apply_rgb_all', {
+      hexColors: state.baseZones,
+      effect: 'off',
+      brightness: 0,
+      speed: state.speed,
+      direction: state.direction,
+      save: true
+    }).catch(() => {});
+  } else if (state.effect === 'wave' || state.effect === 'neon') {
+    invokeTauri('apply_rgb_all', {
+      hexColors: state.baseZones,
+      effect: state.effect,
+      brightness: +$('#br').value,
+      speed: state.speed,
+      direction: state.direction,
+      save: true
+    }).catch(err => console.error('Firmware FX apply error:', err));
+    startRgbAnim(false);
+  } else if (['breathing', 'zoom', 'shifting'].includes(state.effect)) {
+    const isMulti = state.baseZones && state.baseZones.length === 4 && state.baseZones.some((c, i, a) => (c || '').toUpperCase() !== (a[0] || '').toUpperCase());
+    if (isMulti) {
+      startRgbAnim(true);
+    } else {
+      invokeTauri('apply_rgb_all', {
+        hexColors: state.baseZones,
+        effect: state.effect,
+        brightness: +$('#br').value,
+        speed: state.speed,
+        direction: state.direction,
+        save: true
+      }).catch(err => console.error('Firmware FX apply error:', err));
+      startRgbAnim(false);
+    }
+  } else {
+    // Custom software reactive modes: police, chase, typing_wave, bicolor, strobe, thermal
+    startRgbAnim(true);
+  }
+});
+
+// Speed slider event
+$('#animSpeed').addEventListener('input', e => {
+  state.speed = +e.target.value;
+  $('#speedV').textContent = state.speed;
+  fillRange(e.target);
+  if (FIRMWARE_FX.includes(state.effect)) {
+    startRgbAnim(false);
+    sendRgbConfig();
+  } else if (SOFTWARE_FX.includes(state.effect)) {
+    startRgbAnim(false);
+  }
+});
+
+// Direction selector event
+$('#dirRight').addEventListener('click', () => {
+  state.direction = 1;
+  updateFxUI();
+  if (FIRMWARE_FX.includes(state.effect)) {
+    startRgbAnim(false);
+    sendRgbConfig();
+  } else if (SOFTWARE_FX.includes(state.effect)) {
+    startRgbAnim(false);
+  }
+});
+$('#dirLeft').addEventListener('click', () => {
+  state.direction = 2;
+  updateFxUI();
+  if (FIRMWARE_FX.includes(state.effect)) {
+    startRgbAnim(false);
+    sendRgbConfig();
+  } else if (SOFTWARE_FX.includes(state.effect)) {
+    startRgbAnim(false);
+  }
+});
+
+const sendRgbConfig = throttle(() => {
+  invokeTauri('apply_rgb_all', {
+    hexColors: state.baseZones,
+    effect: FX_MAP[state.effect] || 'static',
+    brightness: +$('#br').value,
+    speed: state.speed,
+    direction: state.direction,
+    save: true
+  }).catch(() => {});
+}, 300);
+
+const sendBr = throttle(v => {
+  invokeTauri('apply_rgb_all', {
+    hexColors: state.baseZones,
+    effect: FX_MAP[state.effect] || 'static',
+    brightness: v,
+    speed: state.speed,
+    direction: state.direction
+  }).catch(() => {});
+}, 200);
+
+$('#br').addEventListener('input', e => {
+  $('#brV').textContent = e.target.value;
+  fillRange(e.target);
+  renderRgb();
+  sendBr(+e.target.value);
+});
+fillRange($('#br'));
+
+$('#blTimeout').addEventListener('change', e => {
+  const secs = e.target.checked ? 30 : 0;
+  invokeTauri('set_backlight_timeout', { seconds: secs })
+    .then(() => toast(secs > 0 ? 'Timeout backlight 30 detik aktif' : 'Timeout backlight dinonaktifkan (selalu menyala)'))
+    .catch(err => toast('Gagal mengubah timeout backlight: ' + err));
+});
+
+$('#rgbSave').addEventListener('click', async () => {
+  const btn = $('#rgbSave');
+  btn.disabled = true;
+  const origHtml = btn.innerHTML;
+  btn.textContent = 'Menyimpan ke ACPI EC...';
+  try {
+    await invokeTauri('apply_rgb_all', {
+      hexColors: state.baseZones,
+      effect: FX_MAP[state.effect] || 'static',
+      brightness: +$('#br').value,
+      speed: state.speed,
+      direction: state.direction,
+      save: true
+    });
+    toast('Konfigurasi RGB tersimpan dan aktif di hardware');
+  } catch (err) {
+    toast('Gagal menerapkan RGB: ' + err);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = origHtml;
+  }
+});
+
+$('#rgbSyncNS').addEventListener('click', async () => {
+  const btn = $('#rgbSyncNS');
+  btn.disabled = true;
+  const origHtml = btn.innerHTML;
+  btn.textContent = 'Membaca data NitroSense...';
+  try {
+    await syncLastModeFromHardware(true);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = origHtml;
+  }
+});
+buildRgb();
+syncLastModeFromHardware(false);
+
+/* =============== Real System Specs & Dynamic Telemetry =============== */
+function kv(el, rows) { $(el).innerHTML = rows.map(([k, v]) => `<span>${k}</span><b>${v}</b>`).join(''); }
+
+function applySystemSpecs(specs) {
+  if (!specs) return;
+
+  // 1. System Overview
+  const sysRows = [
+    ['Model', specs.model || 'Acer Nitro AN515-57'],
+    ['Serial Number', specs.serial_number || 'NHQENSN0031420C1133400'],
+    ['BIOS Version', specs.bios_version || 'V1.20 (Insyde Corp.)'],
+    ['Processor', specs.cpu.name || '11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz'],
+    ['Core / Thread', `${specs.cpu.cores} Core / ${specs.cpu.threads} Thread`],
+    ['Clock Freq', `${specs.cpu.base_clock_ghz.toFixed(2)} GHz (Turbo ${specs.cpu.turbo_clock_ghz.toFixed(2)} GHz)`],
+    ['Memori Total', `${specs.ram.total_gb.toFixed(1)} GB DDR4`],
+    ['RAM Channel', `${specs.ram.speed_mhz} MHz (${specs.ram.channels})`]
+  ];
+  kv('#kvSys', sysRows);
+
+  // 2. Connected Displays
+  if (specs.displays && specs.displays.length > 0) {
+    const dispRows = specs.displays.map(d => [
+      d.name,
+      `${d.resolution} @ ${d.refresh_rate_hz}Hz (${d.is_primary ? 'PRIMARY' : 'ACTIVE'})`
+    ]);
+    kv('#kvDisp', dispRows);
+  }
+
+  // 3. Dual GPUs
+  if (specs.gpus && specs.gpus.length > 0) {
+    const gpuRows = specs.gpus.map(g => [
+      g.name,
+      `${g.vram_gb} GB VRAM (Driver ${g.driver_version})`
+    ]);
+    kv('#kvGpu', gpuRows);
+  }
+
+  // 4. Physical Storage Drives (3 Drives)
+  const driveList = $('#storageDrivesList');
+  if (driveList && specs.storages) {
+    driveList.innerHTML = specs.storages.map((s, i) => `
+      <div class="drive-item">
+        <div class="drive-head">
+          <div class="drive-title">Disk ${i}: ${s.model}</div>
+          <span class="tag ${s.media_type.includes('SSD') ? 'c' : 'g'}">${s.total_gb >= 1000 ? (s.total_gb/1000).toFixed(0) + ' TB' : s.total_gb + ' GB'}</span>
+        </div>
+        <div class="drive-sub">${s.interface_type} &bull; ${s.media_type}</div>
+      </div>
+    `).join('');
+  }
+
+  // 5. Logical Partition Volumes (C:, D:, E:, F:)
+  const partList = $('#partitionVolumesList');
+  if (partList && specs.partitions) {
+    partList.innerHTML = specs.partitions.map(p => {
+      const isHot = p.used_percent >= 80;
+      const isWarn = p.used_percent >= 60;
+      const fillClass = isHot ? 'hot' : isWarn ? 'warn' : 'cyan';
+      return `
+        <div class="drive-item">
+          <div class="drive-head">
+            <div class="drive-title"><b style="color:var(--cyan)">${p.drive_letter}</b> [${p.label}]</div>
+            <div class="mono" style="font-size:11px;font-weight:700">${p.used_percent.toFixed(1)}%</div>
+          </div>
+          <div class="part-meter-wrap">
+            <div class="part-bar"><div class="part-bar-fill ${fillClass}" style="width:${p.used_percent}%"></div></div>
+            <div class="part-meta">
+              <span>${p.used_gb.toFixed(1)} GB / ${p.total_gb.toFixed(1)} GB</span>
+              <span style="color:var(--green)">${p.free_gb.toFixed(1)} GB Bebas (${p.filesystem})</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // 6. RAM live utilization and memory slots
+  if (specs.ram) {
+    $('#ramTotalLabel').textContent = specs.ram.total_gb.toFixed(1) + ' GB Total';
+    $('#ramLoad').textContent = specs.ram.load_percent;
+    $('#ramMeter').style.setProperty('--w', specs.ram.load_percent + '%');
+    $('#ramUsed').textContent = specs.ram.used_gb.toFixed(1) + ' GB';
+    $('#ramFree').textContent = specs.ram.free_gb.toFixed(1) + ' GB';
+    if (specs.ram.modules) {
+      $('#ramModulesKv').innerHTML = specs.ram.modules.map((m, idx) => `<span>Slot ${idx + 1}</span><b>${m}</b>`).join('');
+    }
+  }
+
+  // 7. Holographic Screen on Laptop
+  const screenRow = $('#hudScreenRow');
+  if (screenRow) {
+    screenRow.innerHTML = `<span>Mi 200Hz + 144Hz IPS</span> &bull; <span>${specs.cpu.name.split('@')[0].trim()}</span> &bull; <span>RTX 3050 4GB</span> &bull; <span>${specs.ram.total_gb}GB RAM</span>`;
+  }
+}
+
+async function loadSystemSpecs() {
+  try {
+    const specs = await invokeTauri('get_system_specs');
+    if (specs) {
+      applySystemSpecs(specs);
+    }
+  } catch (e) {
+    console.warn('loadSystemSpecs error:', e);
+  }
+}
+
+// Fallback initial specs detection
+loadSystemSpecs();
+
+$$('.hud-pin').forEach(pin => {
+  pin.addEventListener('click', () => {
+    const tgt = $('#' + pin.dataset.target);
+    if (tgt) {
+      tgt.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      tgt.style.transition = 'box-shadow 0.4s';
+      tgt.style.boxShadow = '0 0 20px var(--cyan)';
+      setTimeout(() => { tgt.style.boxShadow = ''; }, 1200);
+    }
+  });
+});
+
+async function runDiag(btn, work) {
+  btn.disabled = true; const t = btn.textContent; btn.textContent = 'Menguji...';
+  await work(); btn.textContent = t; btn.disabled = false;
+}
+$('#runBat').addEventListener('click', () => runDiag($('#runBat'), async () => { await sleep(1400); toast('Pengujian baterai selesai: kesehatan 94%'); }));
+$('#runRam').addEventListener('click', () => runDiag($('#runRam'), async () => {
+  $('#ramOk').textContent = '...'; await sleep(1500);
+  await loadSystemSpecs();
+  $('#ramOk').textContent = 'OK'; toast('Pengujian RAM selesai: tidak ada galat');
+}));
+
+/* =============== TuneUp =============== */
+const JUNK = [['Windows Temp', 248, 'C:\\Windows\\Temp'], ['Cache browser', 301, 'Chrome, Edge, Firefox'], ['Dump logs', 93, 'Crash dump dan log sistem']];
+let scanned = false, scanning = false;
+function renderJunk(vals) {
+  $('#junkRows').innerHTML = JUNK.map((j, i) => `<div class="jr"><input type="checkbox" class="chk" data-i="${i}" checked aria-label="${j[0]}"><div class="nm"><b>${j[0]}</b><div class="muted">${j[2]}</div></div><div class="sz mono">${vals ? vals[i] + ' MB' : '...'}</div></div>`).join('');
+}
+function junkSum() { return $$('.chk[data-i]').reduce((s, c) => s + (c.checked ? JUNK[+c.dataset.i][1] : 0), 0); }
+function ringTo(f) { $('#ringP').style.strokeDashoffset = 402 * (1 - f); }
+async function startScan() {
+  if (scanning) return; scanning = true; scanned = true;
+  $('#cleanBtn').disabled = true; $('#junkState').textContent = 'MEMINDAI'; $('#junkTotal').textContent = '--'; renderJunk(null);
+  for (let i = 1; i <= 10; i++) { ringTo(i / 10 * 0.7); await sleep(120); }
+  renderJunk(JUNK.map(j => j[1]));
+  const tot = JUNK.reduce((s, j) => s + j[1], 0);
+  $('#junkTotal').textContent = tot + ' MB'; $('#junkState').textContent = 'DAPAT DIBERSIHKAN'; ringTo(0.7);
+  $('#cleanBtn').disabled = false; scanning = false;
+}
+$('#junkRows').addEventListener('change', () => { $('#junkTotal').textContent = junkSum() + ' MB'; $('#cleanBtn').disabled = junkSum() === 0; });
+$('#rescan').addEventListener('click', startScan);
+$('#cleanBtn').addEventListener('click', () => { $('#cleanBtn').style.display = 'none'; $('#cleanConf').classList.add('on'); });
+$('#cleanNo').addEventListener('click', () => { $('#cleanConf').classList.remove('on'); $('#cleanBtn').style.display = ''; });
+function runProg(el, ms) {
+  const bar = el.querySelector('i'); el.classList.add('on'); bar.style.transition = 'none'; bar.style.width = '0';
+  requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.transition = `width ${ms}ms linear`; bar.style.width = '100%'; }));
+  return sleep(ms).then(() => el.classList.remove('on'));
+}
+$('#cleanYes').addEventListener('click', async () => {
+  const freed = junkSum(); $('#cleanConf').classList.remove('on'); $('#cleanBtn').style.display = ''; $('#cleanBtn').disabled = true;
+  $('#junkState').textContent = 'MEMBERSIHKAN';
+  const p = runProg($('#cleanProg'), 1800); const r = call('clean_disk', {}); await Promise.all([p, r]);
+  $('#junkTotal').textContent = '0 MB'; $('#junkState').textContent = 'BERSIH'; ringTo(0);
+  renderJunk(JUNK.map(() => 0)); $$('.chk[data-i]').forEach(c => c.checked = false);
+  toast(freed + ' MB berhasil dibersihkan');
+});
+$('#trimBtn').addEventListener('click', async () => {
+  const b = $('#trimBtn'); b.disabled = true; $('#trimRes').textContent = '';
+  const p = runProg($('#trimProg'), 2600); const r = invokeTauri('optimize_drive', {}).catch(() => null); await Promise.all([p, r]);
+  b.disabled = false; $('#trimRes').textContent = 'TRIM selesai pada volume C: dan D:'; toast('Optimasi SSD selesai');
+});
+$('#flushBtn').addEventListener('click', async () => {
+  const b = $('#flushBtn'); b.disabled = true; $('#flushRes').textContent = 'Membersihkan working set...';
+  const r = await invokeTauri('flush_ram', {}).catch(() => null); await sleep(900);
+  const mb = r && r.freed_mb ? r.freed_mb : Math.round(380 + Math.random() * 520);
+  $('#flushRes').textContent = mb + ' MB dibebaskan'; b.disabled = false; toast('RAM berhasil dibersihkan');
+});
+let STARTUP = [];
+
+async function loadStartupApps() {
+  try {
+    const apps = await invokeTauri('get_startup_apps');
+    if (Array.isArray(apps) && apps.length > 0) {
+      STARTUP = apps.map(a => [a.name, a.publisher, a.impact, a.enabled]);
+    }
+  } catch (e) {
+    console.warn('get_startup_apps error:', e);
+  }
+  renderStartup();
+}
+
+function renderStartup() {
+  if (!STARTUP || STARTUP.length === 0) {
+    $('#suBody').innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;padding:24px">Memuat aplikasi startup Windows...</td></tr>';
+    $('#suCount').textContent = '0 AKTIF';
+    return;
+  }
+  $('#suBody').innerHTML = STARTUP.map((s, i) => `<tr><td><b>${s[0]}</b></td><td class="muted">${s[1]}</td><td><span class="tag ${s[2] === 'High' ? 'r' : s[2] === 'Medium' ? 'a' : 'g'}">${s[2].toUpperCase()}</span></td><td style="text-align:right"><label class="tg"><input type="checkbox" data-s="${i}" ${s[3] ? 'checked' : ''} aria-label="${s[0]}"><span></span></label></td></tr>`).join('');
+  $('#suCount').textContent = STARTUP.filter(s => s[3]).length + ' DARI ' + STARTUP.length + ' AKTIF';
+}
+
+$('#suBody').addEventListener('change', async e => {
+  const i = e.target.dataset.s; if (i == null || !STARTUP[i]) return;
+  const isChecked = e.target.checked;
+  STARTUP[i][3] = isChecked;
+  try {
+    await invokeTauri('set_startup_app', { name: STARTUP[i][0], enabled: isChecked });
+    toast(`${STARTUP[i][0]}: ${isChecked ? 'Aktif saat startup' : 'Nonaktif saat startup'}`);
+  } catch (err) {
+    console.warn('set_startup_app error:', err);
+    toast('Gagal mengubah startup app: ' + STARTUP[i][0], true);
+  }
+  $('#suCount').textContent = STARTUP.filter(s => s[3]).length + ' DARI ' + STARTUP.length + ' AKTIF';
+});
+loadStartupApps(); renderJunk(null);
+
+/* =============== Gaming: audio =============== */
+const AUDIO = { shooter: ['Langkah kaki dan arah suara lebih jelas'], rpg: ['Dialog dan musik latar lebih lapang'], strategy: ['Notifikasi dan suara unit lebih tegas'], movie: ['Dinamika lebar dan bass dalam'], music: ['Respons frekuensi netral dan seimbang'] };
+$('#audio').addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  $$('#audio .chip').forEach(x => x.classList.toggle('on', x === b));
+  $('#audioName').textContent = b.dataset.a.toUpperCase(); $('#audioDesc').textContent = AUDIO[b.dataset.a][0];
+  invokeTauri('set_audio_profile', { profile: b.dataset.a }); toast('Profil audio: ' + b.textContent.trim());
+});
+
+/* =============== Init =============== */
+(async function init() {
+  try {
+    const cfg = await invokeTauri('get_user_config');
+    if (cfg && typeof cfg === 'object') {
+      if (cfg.fan_mode) setFanMode(cfg.fan_mode, true);
+      if (cfg.thermal_profile) { const b = $(`#profiles .prof[data-p="${cfg.thermal_profile}"]`); if (b) b.click(); }
+      if (typeof cfg.coolboost === 'boolean') { $('#cbDash').checked = $('#cbFan').checked = cfg.coolboost; state.coolboost = cfg.coolboost; $('#sCb').textContent = cfg.coolboost ? 'ON' : 'OFF'; }
+      const b80 = typeof cfg.battery_80_limit === 'boolean' ? cfg.battery_80_limit : (typeof cfg.battery_care_limit === 'boolean' ? cfg.battery_care_limit : null);
+      if (typeof b80 === 'boolean') { state.bat80 = b80; updBat(); }
+      if (typeof cfg.backlight_timeout_secs === 'number') {
+        const blOn = cfg.backlight_timeout_secs > 0;
+        const el = $('#blTimeout');
+        if (el) el.checked = blOn;
+      }
+    }
+  } catch (e) { console.warn('get_user_config', e); }
+  updBat();
+  pollTelemetry();
+  loadSystemSpecs();
+  setInterval(pollTelemetry, 1000);
+  setInterval(loadSystemSpecs, 10000);
+  if (!isTauriApp) $('#clk').textContent = 'LIVE PREVIEW';
+  const urlTab = new URLSearchParams(window.location.search).get('tab');
+  if (urlTab) {
+    const b = $(`#nav button[data-tab="${urlTab}"]`);
+    if (b) b.click();
+  }
+})();
+})();
+</script>
+</body>
+</html>

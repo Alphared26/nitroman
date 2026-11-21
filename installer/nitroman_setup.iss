@@ -34,8 +34,8 @@ RestartApplications=no
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
-Name: "autostart"; Description: "Launch NitroMan automatically at Windows logon (Elevated Task Scheduler)"; GroupDescription: "Startup Options:"
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkedonce
+Name: "autostart"; Description: "Launch NitroMan automatically at Windows logon (Elevated Task Scheduler)"; GroupDescription: "Startup Options:"; Flags: checkedonce
 
 [Files]
 ; Core Application Files
@@ -61,10 +61,10 @@ Filename: "{cmd}"; Parameters: "/c sc query PSSvc >nul 2>&1 || sc create PSSvc b
 Filename: "{cmd}"; Parameters: "/c sc config PSSvc start= auto && sc start PSSvc"; Flags: runhidden
 
 ; Configure Windows Task Scheduler to run NitroMan elevated at logon (No UAC prompts)
-Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -Command ""$A = New-ScheduledTaskAction -Execute '{app}\{#MyAppExeName}'; $T = New-ScheduledTaskTrigger -AtLogOn; $P = New-ScheduledTaskPrincipal -GroupId 'BUILTIN\Administrators' -RunLevel Highest; $S = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit 0; Unregister-ScheduledTask -TaskName 'NitroMan' -Confirm:$false -ErrorAction SilentlyContinue; Register-ScheduledTask -TaskName 'NitroMan' -Action $A -Trigger $T -Principal $P -Settings $S"""; Flags: runhidden; Tasks: autostart
+Filename: "{cmd}"; Parameters: "/c schtasks /create /tn ""NitroMan"" /tr """"{app}\{#MyAppExeName}"""" /sc onlogon /rl highest /f"; Flags: runhidden; Tasks: autostart
 
-; Launch NitroMan after installation
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+; Launch NitroMan after installation with elevated privileges
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent runascurrentuser
 
 [UninstallRun]
 Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runhidden; RunOnceId: "StopNitroMan"

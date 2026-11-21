@@ -47,9 +47,14 @@ Source: "app_icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 ; NitroSense Service Files (Protected Ring-0 EC Named Pipe Provider)
 Source: "bundled\service_nitrosense\*"; DestDir: "{commonpf}\Acer\NitroSense Service"; Flags: ignoreversion recursesubdirs createallsubdirs uninsneveruninstall
+Source: "bundled\service_nitrosense\*"; DestDir: "{app}\service_nitrosense"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; Care Center WMI Bridge Utilities (Battery 80% Conservation Mode Provider)
 Source: "bundled\service_carecenter\*"; DestDir: "{commonpf32}\Acer\Care Center"; Flags: ignoreversion uninsneveruninstall
+
+[Registry]
+Root: HKLM; Subkey: "SOFTWARE\OEM\NitroSense"; Flags: noerror
+Root: HKLM; Subkey: "SOFTWARE\OEM\NitroSense\KeyAssignment"; Flags: noerror
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\app_icon.ico"

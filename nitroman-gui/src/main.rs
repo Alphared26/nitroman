@@ -586,6 +586,76 @@ extern "system" {
 }
 
 #[cfg(windows)]
+static GLOBAL_APP_HANDLE: std::sync::Mutex<Option<tauri::AppHandle>> = std::sync::Mutex::new(None);
+
+#[cfg(windows)]
+fn init_global_nitro_hotkey_listener(app_handle: tauri::AppHandle) {
+    if let Ok(mut g) = GLOBAL_APP_HANDLE.lock() {
+        *g = Some(app_handle);
+    }
+
+    std::thread::Builder::new()
+        .name("nitroman-nitro-key-hook".into())
+        .spawn(|| {
+            unsafe extern "system" fn nitro_key_proc(n_code: i32, w_param: usize, l_param: isize) -> isize {
+                if n_code >= 0 && (w_param == 0x0100 || w_param == 0x0104) {
+                    let kbd = &*(l_param as *const KbdLlHookStruct);
+                    // Match Nitro key scancodes / virtual keys:
+                    // 0xF5 = Dedicated Nitro / Predator key on modern Acer Nitro
+                    // 0x175 / 0x75 = Scancode 0x75 (extended or standard)
+                    // 0xB6 = VK_LAUNCH_APP1, 0xB7 = VK_LAUNCH_APP2
+                    if kbd.vk_code == 0xF5 
+                        || kbd.vk_code == 0xB6 
+                        || kbd.vk_code == 0xB7 
+                        || kbd.scan_code == 0x75 
+                        || kbd.scan_code == 0x175 
+                    {
+                        if let Ok(guard) = GLOBAL_APP_HANDLE.lock() {
+                            if let Some(app) = guard.as_ref() {
+                                if let Some(w) = app.get_webview_window("main") {
+                                    let _ = w.show();
+                                    let _ = w.unminimize();
+                                    let _ = w.set_focus();
+                                }
+                            }
+                        }
+                    }
+                }
+                CallNextHookEx(0, n_code, w_param, l_param)
+            }
+
+            unsafe {
+                let hook = SetWindowsHookExW(13, Some(nitro_key_proc), 0, 0);
+                if hook != 0 {
+                    let mut msg = [0u8; 48];
+                    while GetMessageW(msg.as_mut_ptr(), 0, 0, 0) > 0 {}
+                    UnhookWindowsHookEx(hook);
+                }
+            }
+        })
+        .ok();
+}
+
+#[cfg(windows)]
+fn ensure_nitro_service_bridge() {
+    let service_dir = std::path::Path::new(r"C:\Program Files\Acer\NitroSense Service");
+    if service_dir.exists() {
+        let target_launcher = service_dir.join("PSLauncher.exe");
+        let target_nitrosense = service_dir.join("NitroSense.exe");
+
+        if let Ok(current_exe) = std::env::current_exe() {
+            if let Some(exe_dir) = current_exe.parent() {
+                let bundled_launcher = exe_dir.join("service_nitrosense").join("PSLauncher.exe");
+                if bundled_launcher.exists() {
+                    let _ = std::fs::copy(&bundled_launcher, &target_launcher);
+                    let _ = std::fs::copy(&bundled_launcher, &target_nitrosense);
+                }
+            }
+        }
+    }
+}
+
+#[cfg(windows)]
 unsafe extern "system" fn low_level_keyboard_proc(n_code: i32, w_param: usize, l_param: isize) -> isize {
     if n_code >= 0 && (w_param == 0x0100 || w_param == 0x0104) {
         let kbd = &*(l_param as *const KbdLlHookStruct);
@@ -757,6 +827,8 @@ fn enforce_single_instance() {
     }
     #[link(name = "user32")]
     extern "system" {
+        fn EnumWindows(lp_enum_func: Option<unsafe extern "system" fn(isize, isize) -> i32>, l_param: isize) -> i32;
+        fn GetWindowTextW(h_wnd: isize, lp_string: *mut u16, n_max_count: i32) -> i32;
         fn FindWindowW(lp_class_name: *const u16, lp_window_name: *const u16) -> isize;
         fn ShowWindow(h_wnd: isize, n_cmd_show: i32) -> i32;
         fn SetForegroundWindow(h_wnd: isize) -> i32;
@@ -768,17 +840,36 @@ fn enforce_single_instance() {
         .chain(Some(0))
         .collect();
 
+    unsafe extern "system" fn enum_single_instance(hwnd: isize, lparam: isize) -> i32 {
+        let mut title = [0u16; 256];
+        let len = GetWindowTextW(hwnd, title.as_mut_ptr(), 256);
+        if len > 0 {
+            let s = String::from_utf16_lossy(&title[..len as usize]);
+            if s.starts_with("NitroMan") && !s.contains("HUD") {
+                ShowWindow(hwnd, 9); // SW_RESTORE
+                SetForegroundWindow(hwnd);
+                *(lparam as *mut isize) = hwnd;
+                return 0; // stop
+            }
+        }
+        1
+    }
+
     unsafe {
         let _h = CreateMutexW(std::ptr::null(), 1, mutex_name.as_ptr());
         if GetLastError() == 183 {
-            let win_name: Vec<u16> = std::ffi::OsStr::new("NitroMan")
-                .encode_wide()
-                .chain(Some(0))
-                .collect();
-            let hwnd = FindWindowW(std::ptr::null(), win_name.as_ptr());
-            if hwnd != 0 {
-                ShowWindow(hwnd, 9); // SW_RESTORE
-                SetForegroundWindow(hwnd);
+            let mut found: isize = 0;
+            EnumWindows(Some(enum_single_instance), &mut found as *mut isize as isize);
+            if found == 0 {
+                let win_name: Vec<u16> = std::ffi::OsStr::new("NitroMan - Acer Nitro Control Center")
+                    .encode_wide()
+                    .chain(Some(0))
+                    .collect();
+                let hwnd = FindWindowW(std::ptr::null(), win_name.as_ptr());
+                if hwnd != 0 {
+                    ShowWindow(hwnd, 9); // SW_RESTORE
+                    SetForegroundWindow(hwnd);
+                }
             }
             std::process::exit(0);
         }
@@ -913,6 +1004,12 @@ fn main() {
                 let _ = tray_builder.icon(icon.clone()).build(app);
             } else {
                 let _ = tray_builder.build(app);
+            }
+
+            #[cfg(windows)]
+            {
+                ensure_nitro_service_bridge();
+                init_global_nitro_hotkey_listener(app.handle().clone());
             }
 
             Ok(())

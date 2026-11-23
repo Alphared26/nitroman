@@ -328,6 +328,11 @@ fn set_backlight_timeout(seconds: u32, state: State<AppState>) -> Result<String,
 }
 
 #[tauri::command]
+fn get_backlight_timeout(state: State<AppState>) -> Result<u32, String> {
+    state.driver.get_backlight_timeout().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 fn optimize_drive() -> Result<String, String> {
     #[cfg(windows)]
     {
@@ -969,9 +974,7 @@ fn main() {
     let driver = AcerDriver::new();
     let config = UserConfig::load();
     BACKLIGHT_TIMEOUT_SECS.store(config.backlight_timeout_secs, std::sync::atomic::Ordering::SeqCst);
-    if config.backlight_timeout_secs > 0 {
-        let _ = driver.set_backlight_timeout(config.backlight_timeout_secs);
-    }
+    let _ = driver.set_backlight_timeout(config.backlight_timeout_secs);
 
     tauri::Builder::default()
         .manage(AppState {
@@ -993,6 +996,7 @@ fn main() {
             clean_disk,
             minimize_to_tray,
             set_backlight_timeout,
+            get_backlight_timeout,
             optimize_drive,
             flush_ram,
             get_startup_apps,

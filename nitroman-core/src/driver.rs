@@ -320,6 +320,18 @@ impl AcerDriver {
         Ok(())
     }
 
+    /// Queries the current keyboard backlight timeout in seconds from hardware EC.
+    pub fn get_backlight_timeout(&self) -> Result<u32> {
+        let out = self.run_ec(&["timeout", "get"])?;
+        for line in out.lines() {
+            let trimmed = line.trim();
+            if let Ok(v) = trimmed.parse::<u32>() {
+                return Ok(v);
+            }
+        }
+        Err(Error::InvalidData("Invalid response from timeout query".into()))
+    }
+
     /// Sets keyboard backlight color for a specific zone (1..=4).
     pub fn set_rgb_zone_color(&self, zone: u8, r: u8, g: u8, b: u8) -> Result<()> {
         let z_str = zone.clamp(1, 4).to_string();

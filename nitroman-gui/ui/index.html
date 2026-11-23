@@ -2959,6 +2959,12 @@ $('#audio').addEventListener('click', e => {
         const el = $('#blTimeout');
         if (el) el.checked = blOn;
       }
+      invokeTauri('get_backlight_timeout').then(secs => {
+        if (typeof secs === 'number') {
+          const el = $('#blTimeout');
+          if (el) el.checked = (secs > 0);
+        }
+      }).catch(() => {});
       if (typeof cfg.autostart_elevated === 'boolean') {
         const el = $('#suSelf');
         if (el) el.checked = cfg.autostart_elevated;

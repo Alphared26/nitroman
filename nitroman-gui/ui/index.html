@@ -2959,6 +2959,14 @@ $('#audio').addEventListener('click', e => {
         const el = $('#blTimeout');
         if (el) el.checked = blOn;
       }
+      if (typeof cfg.autostart_elevated === 'boolean') {
+        const el = $('#suSelf');
+        if (el) el.checked = cfg.autostart_elevated;
+      }
+      invokeTauri('get_autostart').then(enabled => {
+        const el = $('#suSelf');
+        if (el && typeof enabled === 'boolean') el.checked = enabled;
+      }).catch(() => {});
     }
   } catch (e) { console.warn('get_user_config', e); }
   updBat();

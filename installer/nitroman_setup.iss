@@ -34,8 +34,8 @@ RestartApplications=no
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkedonce
-Name: "autostart"; Description: "Launch NitroMan automatically at Windows logon (Elevated Task Scheduler)"; GroupDescription: "Startup Options:"; Flags: checkedonce
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+Name: "autostart"; Description: "Launch NitroMan automatically at Windows logon (Elevated Task Scheduler)"; GroupDescription: "Startup Options:"
 
 [Files]
 ; Core Application Files
@@ -66,7 +66,7 @@ Filename: "{cmd}"; Parameters: "/c sc query PSSvc >nul 2>&1 || sc create PSSvc b
 Filename: "{cmd}"; Parameters: "/c sc config PSSvc start= auto && sc start PSSvc"; Flags: runhidden
 
 ; Configure Windows Task Scheduler to run NitroMan elevated at logon (No UAC prompts)
-Filename: "{cmd}"; Parameters: "/c schtasks /create /tn ""NitroMan"" /tr """"{app}\{#MyAppExeName}"""" /sc onlogon /rl highest /f"; Flags: runhidden; Tasks: autostart
+Filename: "schtasks.exe"; Parameters: "/create /tn ""NitroMan"" /tr """"{app}\{#MyAppExeName}"""" /sc onlogon /rl highest /f"; Flags: runhidden; Tasks: autostart
 
 ; Launch NitroMan after installation with elevated privileges
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent runascurrentuser
@@ -74,3 +74,12 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 [UninstallRun]
 Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runhidden; RunOnceId: "StopNitroMan"
 Filename: "schtasks.exe"; Parameters: "/delete /tn NitroMan /f"; Flags: runhidden; RunOnceId: "RemoveScheduledTask"
+
+[Code]
+function InitializeSetup(): Boolean;
+var
+  ResultCode: Integer;
+begin
+  Exec('taskkill.exe', '/F /IM {#MyAppExeName}', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Result := True;
+end;

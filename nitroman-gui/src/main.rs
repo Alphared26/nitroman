@@ -474,6 +474,59 @@ fn set_startup_app(name: String, enabled: bool) -> Result<String, String> {
 }
 
 #[tauri::command]
+fn get_autostart(state: State<AppState>) -> bool {
+    #[cfg(windows)]
+    {
+        if let Ok(out) = std::process::Command::new("schtasks")
+            .args(["/query", "/tn", "NitroMan"])
+            .output()
+        {
+            if out.status.success() {
+                return true;
+            }
+        }
+    }
+    state.config.lock().unwrap().autostart_elevated
+}
+
+#[tauri::command]
+fn set_autostart(enabled: bool, state: State<AppState>) -> Result<String, String> {
+    #[cfg(windows)]
+    {
+        if enabled {
+            let target_exe = if std::path::Path::new(r"C:\Program Files\NitroMan\NitroMan.exe").exists() {
+                r"C:\Program Files\NitroMan\NitroMan.exe".to_string()
+            } else if let Ok(cur) = std::env::current_exe() {
+                cur.to_string_lossy().to_string()
+            } else {
+                r"C:\Program Files\NitroMan\NitroMan.exe".to_string()
+            };
+
+            let tr_param = format!("\"{}\"", target_exe);
+            let res = std::process::Command::new("schtasks")
+                .args(["/create", "/tn", "NitroMan", "/tr", &tr_param, "/sc", "onlogon", "/rl", "highest", "/f"])
+                .output()
+                .map_err(|e| format!("Failed to run schtasks: {e}"))?;
+
+            if !res.status.success() {
+                let err = String::from_utf8_lossy(&res.stderr);
+                return Err(format!("schtasks failed: {err}"));
+            }
+        } else {
+            let _ = std::process::Command::new("schtasks")
+                .args(["/delete", "/tn", "NitroMan", "/f"])
+                .output();
+        }
+    }
+
+    let mut cfg = state.config.lock().unwrap();
+    cfg.autostart_elevated = enabled;
+    let _ = cfg.save();
+
+    Ok(format!("Autostart set to {enabled}"))
+}
+
+#[tauri::command]
 fn set_audio_profile(profile: String) -> Result<String, String> {
     Ok(format!("Audio profile set to {profile}"))
 }
@@ -634,6 +687,33 @@ fn init_global_nitro_hotkey_listener(app_handle: tauri::AppHandle) {
             }
         })
         .ok();
+}
+
+#[cfg(windows)]
+fn ensure_autostart_task() {
+    let check = std::process::Command::new("schtasks")
+        .args(["/query", "/tn", "NitroMan"])
+        .output();
+
+    let needs_creation = match check {
+        Ok(out) => !out.status.success(),
+        Err(_) => true,
+    };
+
+    if needs_creation {
+        let target_exe = if std::path::Path::new(r"C:\Program Files\NitroMan\NitroMan.exe").exists() {
+            r"C:\Program Files\NitroMan\NitroMan.exe".to_string()
+        } else if let Ok(cur) = std::env::current_exe() {
+            cur.to_string_lossy().to_string()
+        } else {
+            r"C:\Program Files\NitroMan\NitroMan.exe".to_string()
+        };
+
+        let tr_param = format!("\"{}\"", target_exe);
+        let _ = std::process::Command::new("schtasks")
+            .args(["/create", "/tn", "NitroMan", "/tr", &tr_param, "/sc", "onlogon", "/rl", "highest", "/f"])
+            .output();
+    }
 }
 
 #[cfg(windows)]
@@ -920,6 +1000,8 @@ fn main() {
             set_audio_profile,
             get_system_specs,
             toggle_hud_window,
+            get_autostart,
+            set_autostart,
             start_typing_wave_hook,
             stop_typing_wave_hook,
             flush_rgb_stream
@@ -1010,6 +1092,7 @@ fn main() {
             {
                 ensure_nitro_service_bridge();
                 init_global_nitro_hotkey_listener(app.handle().clone());
+                ensure_autostart_task();
             }
 
             Ok(())

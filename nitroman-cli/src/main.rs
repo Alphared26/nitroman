@@ -17,6 +17,7 @@ fn print_help() {
     println!("  rgb <hex1> <hex2> <hex3> <hex4> Set 4-zone keyboard backlight colors");
     println!("  rgb-effect <static|breathing|wave|off> Set keyboard lighting effect");
     println!("  clean                         Perform temporary disk cleanup");
+    println!("  timeout <on|off|secs|get>     Configure keyboard backlight auto-off timeout");
     println!("  config                        Display active saved configuration");
 }
 
@@ -262,6 +263,46 @@ fn main() {
                     .output();
             }
             println!("Temporary cache cleaned successfully.");
+        }
+
+        "timeout" => {
+            if args.len() < 3 {
+                match driver.get_backlight_timeout() {
+                    Ok(t) => println!("Keyboard backlight timeout: {t}s (0 = always-on)"),
+                    Err(e) => eprintln!("Failed to query timeout: {e}"),
+                }
+                return;
+            }
+            if args[2].to_lowercase() == "get" {
+                match driver.get_backlight_timeout() {
+                    Ok(t) => println!("{t}"),
+                    Err(e) => eprintln!("Failed to query timeout: {e}"),
+                }
+                return;
+            }
+            let secs: u32 = match args[2].to_lowercase().as_str() {
+                "off" | "0" | "disable" | "disabled" | "false" => 0,
+                "on" | "enable" | "enabled" | "true" => 30,
+                num => match num.parse::<u32>() {
+                    Ok(n) => n,
+                    Err(_) => {
+                        eprintln!("Invalid timeout value. Use 'on', 'off', or seconds (e.g. 30).");
+                        return;
+                    }
+                },
+            };
+            match driver.set_backlight_timeout(secs) {
+                Ok(_) => {
+                    config.backlight_timeout_secs = secs;
+                    let _ = config.save();
+                    println!(
+                        "Keyboard backlight timeout set to {} ({}s)",
+                        if secs == 0 { "Always On (no timeout)" } else { "Timeout enabled" },
+                        secs
+                    );
+                }
+                Err(e) => eprintln!("Failed to set backlight timeout: {e}"),
+            }
         }
 
         "config" => {

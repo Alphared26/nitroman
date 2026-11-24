@@ -69,7 +69,7 @@ Filename: "{cmd}"; Parameters: "/c sc config PSSvc start= auto && sc start PSSvc
 Filename: "schtasks.exe"; Parameters: "/create /tn ""NitroMan"" /tr """"{app}\{#MyAppExeName}"""" /sc onlogon /rl highest /f"; Flags: runhidden; Tasks: autostart
 
 ; Launch NitroMan after installation with elevated privileges
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent runascurrentuser
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent shellexec
 
 [UninstallRun]
 Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runhidden; RunOnceId: "StopNitroMan"

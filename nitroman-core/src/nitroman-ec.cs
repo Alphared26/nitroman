@@ -611,6 +611,8 @@ class Program {
             EnsurePSSvc();
             SendPipeCommand(29, 8UL | (0x0FUL << 40));
             SendPipeCommand(27, 100UL << 16);
+        ulong curTimeout = GetBacklightTimeoutHardware();
+        SetBacklightTimeoutHardware(curTimeout);
             byte lastBr = 100;
             lastStreamZoneVals[0] = 0xFFFFFFFF;
             lastStreamZoneVals[1] = 0xFFFFFFFF;
@@ -798,6 +800,11 @@ class Program {
 
             ulong backlightVal = ((ulong)brightness) << 16;
             SendPipeCommand(27, backlightVal);
+
+            // Command 27 in firmware resets the backlight timeout timer back to default.
+            // Re-assert active timeout configuration so backlight stays permanently on if configured.
+            ulong curTimeout = GetBacklightTimeoutHardware();
+            SetBacklightTimeoutHardware(curTimeout);
         } else {
             // FIRMWARE DYNAMIC EFFECT MODE:
             // Official NitroSense effects: Breathing, Wave, Zoom, Shifting, Neon
@@ -832,6 +839,8 @@ class Program {
 
             // PSSvc named pipe execution (Command 27)
             lastRes = SendPipeCommand(27, dynVal);
+            ulong curTimeout = GetBacklightTimeoutHardware();
+            SetBacklightTimeoutHardware(curTimeout);
         }
 
         // If pipe returned 0x36 (Access Denied / Not Whitelisted) and we're not running from service folder, forward to helper
@@ -866,6 +875,8 @@ class Program {
         SendPipeCommand(29, 8UL | (0x0FUL << 40));
         uint res = SendPipeCommand(28, rgbVal);
         SendPipeCommand(27, 100UL << 16);
+        ulong curTimeout = GetBacklightTimeoutHardware();
+        SetBacklightTimeoutHardware(curTimeout);
 
         if (res == 0x36 && !IsInNitroSenseServiceDir()) {
             ForwardToServiceHelper(originalArgs);
@@ -1426,8 +1437,19 @@ class Program {
         ulong val = 1UL | ((ulong)bkHotkey << 8) | 0x80000UL;
         ulong res = QueryPipeCommand(20, val);
         if ((res & 0xFF) == 0) {
-            return (res >> 40) & 0xFF;
+            ulong t = (res >> 40) & 0xFF;
+            if (t > 0) return t;
         }
+
+        try {
+            using (var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\OEM\NitroSense\AdvanceSettings")) {
+                if (key != null) {
+                    object obj = key.GetValue("backlight_timeout");
+                    if (obj != null) return Convert.ToUInt64(obj);
+                }
+            }
+        } catch {}
+
         return 0;
     }
 
@@ -1460,7 +1482,10 @@ class Program {
 
         try {
             using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\OEM\NitroSense\AdvanceSettings")) {
-                if (key != null) key.SetValue("brightness_percentage", (int)brPct, RegistryValueKind.DWord);
+                if (key != null) {
+                    key.SetValue("brightness_percentage", (int)brPct, RegistryValueKind.DWord);
+                    key.SetValue("backlight_timeout", (int)timeoutSec, RegistryValueKind.DWord);
+                }
             }
         } catch {}
 

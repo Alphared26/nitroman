@@ -2678,7 +2678,10 @@ $('#blTimeout').addEventListener('change', e => {
   const secs = e.target.checked ? 30 : 0;
   invokeTauri('set_backlight_timeout', { seconds: secs })
     .then(() => toast(secs > 0 ? 'Timeout backlight 30 detik aktif' : 'Timeout backlight dinonaktifkan (selalu menyala)'))
-    .catch(err => toast('Gagal mengubah timeout backlight: ' + err));
+    .catch(err => {
+      e.target.checked = !e.target.checked;
+      toast('Gagal mengubah timeout backlight: ' + err);
+    });
 });
 
 $('#rgbSave').addEventListener('click', async () => {
@@ -2962,7 +2965,9 @@ $('#audio').addEventListener('click', e => {
       invokeTauri('get_backlight_timeout').then(secs => {
         if (typeof secs === 'number') {
           const el = $('#blTimeout');
-          if (el) el.checked = (secs > 0);
+          if (el && typeof cfg.backlight_timeout_secs !== 'number') {
+            el.checked = (secs > 0);
+          }
         }
       }).catch(() => {});
       if (typeof cfg.autostart_elevated === 'boolean') {

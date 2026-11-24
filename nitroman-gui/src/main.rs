@@ -329,7 +329,16 @@ fn set_backlight_timeout(seconds: u32, state: State<AppState>) -> Result<String,
 
 #[tauri::command]
 fn get_backlight_timeout(state: State<AppState>) -> Result<u32, String> {
-    state.driver.get_backlight_timeout().map_err(|e| e.to_string())
+    match state.driver.get_backlight_timeout() {
+        Ok(secs) => Ok(secs),
+        Err(_) => {
+            if let Ok(cfg) = state.config.lock() {
+                Ok(cfg.backlight_timeout_secs)
+            } else {
+                Ok(BACKLIGHT_TIMEOUT_SECS.load(std::sync::atomic::Ordering::SeqCst))
+            }
+        }
+    }
 }
 
 #[tauri::command]
